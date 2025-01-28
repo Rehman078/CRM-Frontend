@@ -1,25 +1,33 @@
-import React, { useState } from 'react';
-import logo from '../assets/crm.png';
-import { TextField, Button, Typography, Box, Container, Paper } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import logo from "../assets/crm.png";
+import {
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Container,
+  Paper,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContaxt";
 import { loginUser } from "../services/AuthApi";
+import { Toaster, toast } from "react-hot-toast";
 
 function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const data = await loginUser({ email, password });
-      login(data.data); 
-    navigate('/dashboard');
+      login(data.data);
+      navigate("/");
+      toast.success("Successfully logged in!");
     } catch (err) {
-      setError("Invalid email or password.");
+      toast.error("Invalid email or password.");
     }
   };
 
@@ -27,22 +35,23 @@ function Login() {
     <Container
       maxWidth="sm"
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
       }}
     >
+      <Toaster position="top-right" reverseOrder={false} />
       <Paper
         elevation={24}
         sx={{
-          pb:5,
-          pt:3,
-          px:5,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          pb: 5,
+          pt: 3,
+          px: 5,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
         {/* Centered Logo */}
@@ -51,14 +60,13 @@ function Login() {
           src={logo}
           alt="logo"
           sx={{
-            width: '130px', 
-            height: 'auto',
+            width: "130px",
+            height: "auto",
           }}
         />
         <Typography variant="h4" align="center" gutterBottom>
           Login
         </Typography>
-        {error && <p className="error">{error}</p>}
         {/* Form */}
         <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 2 }}>
           <TextField
