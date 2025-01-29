@@ -18,7 +18,8 @@ function Login() {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+ 
+  // Login function
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -42,6 +43,7 @@ function Login() {
         height: "100vh",
       }}
     >
+    
       <Toaster position="top-right" reverseOrder={false} />
       <Paper
         elevation={24}

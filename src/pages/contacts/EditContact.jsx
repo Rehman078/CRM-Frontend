@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Toaster, toast } from "react-hot-toast";
+import React, { useEffect, useState } from "react";
 import {
   TextField,
   Button,
@@ -15,19 +14,15 @@ import {
   CardContent,
   Grid,
 } from "@mui/material";
-import { addContacts } from "../../services/ContactApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContaxt";
 import AppBarComponent from "../../components/AppBar";
 import DrawerComponent from "../../components/SideBar";
+import { getContactsById, updateContact } from "../../services/ContactApi";
+import { Toaster, toast } from "react-hot-toast";
 
-function AddContact() {
-  const [open, setOpen] = React.useState(false);
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
-  const { logout } = useAuth();
-  const navigate = useNavigate();
-  // Form data state
+function EditContact() {
+  const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,39 +31,48 @@ function AddContact() {
     company: "",
     tags: [],
   });
-  //logout function
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  // Handle drawer opening and closing
+  const handleDrawerOpen = () => setOpen(true);
+  const handleDrawerClose = () => setOpen(false);
+
+  // Handle logout
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
-  // Handle form input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "tags") {
-      setFormData({
-        ...formData,
-        tags: typeof value === "string" ? value.split(",") : value,
-      });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
+  //get contact data by id
+  useEffect(() => {
+    const fetchContactsData = async () => {
+      try {
+        const contacts = await getContactsById();
 
-  // Handle contact form submit
+        const contact = contacts.find((contact) => contact._id === id);
+        if (contact) {
+          setFormData(contact);
+        } else {
+          console.error("Contact not found for ID:", id);
+        }
+      } catch (error) {
+        console.error("Error fetching contacts:", error.message);
+      }
+    };
+
+    fetchContactsData();
+  }, [id]);
+
+  // Handle form submission for contact update
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!formData.name || !formData.email || !formData.phone) {
-      toast.error("Name, Email, and Phone are required.");
-      return;
-    }
-
     try {
-      const response = await addContacts(formData);
-      toast.success("Contact added successfully!");
+      await updateContact(id, formData);
+      toast.success("Contact updated successfully!");
     } catch (error) {
-      toast.error("Failed to add contact. Please try again.");
+      console.error("Error updating contact", error);
     }
   };
 
@@ -80,6 +84,7 @@ function AddContact() {
         handleLogout={handleLogout}
       />
       <DrawerComponent open={open} handleDrawerClose={handleDrawerClose} />
+      <Toaster position="top-right" reverseOrder={false} />
       <Box
         component="main"
         sx={{
@@ -90,7 +95,6 @@ function AddContact() {
           transition: "margin 0.3s ease",
         }}
       >
-        <Toaster position="top-right" reverseOrder={false} />
         <Card
           sx={{
             margin: "auto",
@@ -102,7 +106,7 @@ function AddContact() {
         >
           <CardContent>
             <Typography variant="h5" gutterBottom align="center">
-              Add New Contact
+              Edit Contact
             </Typography>
 
             <form onSubmit={handleSubmit}>
@@ -112,7 +116,9 @@ function AddContact() {
                     label="Name"
                     name="name"
                     value={formData.name}
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     fullWidth
                     margin="normal"
                   />
@@ -123,7 +129,9 @@ function AddContact() {
                     label="Email"
                     name="email"
                     value={formData.email}
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     fullWidth
                     margin="normal"
                   />
@@ -134,7 +142,9 @@ function AddContact() {
                     label="Phone"
                     name="phone"
                     value={formData.phone}
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
                     fullWidth
                     margin="normal"
                   />
@@ -145,7 +155,9 @@ function AddContact() {
                     label="Address"
                     name="address"
                     value={formData.address}
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setFormData({ ...formData, address: e.target.value })
+                    }
                     fullWidth
                     margin="normal"
                   />
@@ -156,21 +168,24 @@ function AddContact() {
                     label="Company"
                     name="company"
                     value={formData.company}
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setFormData({ ...formData, company: e.target.value })
+                    }
                     fullWidth
                     margin="normal"
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                  {/* form */}
                   <FormControl fullWidth margin="normal">
                     <InputLabel>Tags</InputLabel>
                     <Select
                       multiple
                       name="tags"
-                      value={formData.tags}
-                      onChange={handleChange}
+                      value={formData.tags || []} // Ensure it's always an array
+                      onChange={(e) =>
+                        setFormData({ ...formData, tags: e.target.value })
+                      }
                       input={<Input />}
                       renderValue={(selected) => (
                         <div>
@@ -183,7 +198,6 @@ function AddContact() {
                       <MenuItem value="T1">T1</MenuItem>
                       <MenuItem value="T2">T2</MenuItem>
                       <MenuItem value="T3">T3</MenuItem>
-                      {/* Add more tags as needed */}
                     </Select>
                   </FormControl>
                 </Grid>
@@ -196,7 +210,7 @@ function AddContact() {
                   }}
                 >
                   <Button type="submit" variant="contained">
-                    Add Contact
+                    Save Changes
                   </Button>
                 </Box>
               </Grid>
@@ -208,4 +222,4 @@ function AddContact() {
   );
 }
 
-export default AddContact;
+export default EditContact;

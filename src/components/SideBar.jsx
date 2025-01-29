@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { styled, useTheme } from "@mui/material/styles";
+import ContactsIcon from "@mui/icons-material/Contacts";
 import MuiDrawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -99,7 +100,7 @@ export default function DrawerComponent({ open, handleDrawerClose }) {
               <ListItemIcon
                 sx={{ minWidth: 0, justifyContent: "center", color: "white" }}
               >
-                <InboxIcon />
+                <ContactsIcon />
               </ListItemIcon>
               <ListItemText
                 primary="Contact"

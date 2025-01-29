@@ -1,4 +1,4 @@
-import React from "react";
+import  {React, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContaxt";
 import { Box, Typography } from "@mui/material";
@@ -6,14 +6,16 @@ import AppBarComponent from "../components/AppBar";
 import DrawerComponent from "../components/SideBar";
 
 export default function MiniDrawer() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
+  
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  // Logout function
   const handleLogout = () => {
     logout();
-    // toast.success("Successfully logged out!");
     navigate("/");
   };
 
