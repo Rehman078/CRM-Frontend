@@ -12,6 +12,8 @@ import {
   Select,
   InputLabel,
   FormControl,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContaxt";
@@ -71,6 +73,12 @@ function EditLead() {
     }
   };
 
+     // Breadcrumb name
+      const breadcrumbItems = [
+        { label: "Dashboard", Link: "/", href: "" },
+        { label: "Edit Lead", href: "", isLast: true },
+      ];
+
   return (
     <Box sx={{ display: "flex" }}>
       <AppBarComponent
@@ -89,8 +97,35 @@ function EditLead() {
           transition: "margin 0.3s ease",
         }}
       >
+            <Box
+          sx={{
+            marginTop: 8,
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
+          <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
+            {breadcrumbItems.map((item, index) =>
+              item.isLast ? (
+                <Typography key={index} sx={{ color: "white" }}>
+                  {item.label}
+                </Typography>
+              ) : (
+                <Link
+                  key={index}
+                  underline="hover"
+                  sx={{ color: "#d1c4e9" }}
+                  href={item.href}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
+          </Breadcrumbs>
+        </Box>
         <Toaster position="top-right" reverseOrder={false} />
-        <Card sx={{ margin: "auto", marginTop: 10, maxWidth: 900, padding: 3 }}>
+        <Card sx={{ margin: "auto", marginTop: 8, maxWidth: 900, padding: 3 }}>
           <CardContent>
             <Typography variant="h5" gutterBottom align="center">
               Update Lead

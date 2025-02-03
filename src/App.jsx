@@ -6,7 +6,7 @@ import DashboardHome from "./pages/DashboardHome";
 import Contact from "./pages/contacts/Contact";
 import AddContact from "./pages/contacts/AddContact";
 import EditContact from "./pages/contacts/EditContact";
-import File from "./pages/files/File";
+import SingleContact from "./pages/contacts/SingleContact";
 import Lead from "./pages/leads/Lead";
 import AddLead from "./pages/leads/AddLead";
 import EditLead from "./pages/leads/EditLead";
@@ -51,12 +51,11 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* File Route */}
           <Route
-            path="/file"
+            path="/contactdetail/:id"
             element={
               <ProtectedRoute>
-                <File />
+              <SingleContact/>
               </ProtectedRoute>
             }
           />
@@ -86,6 +85,7 @@ function App() {
               </ProtectedRoute>
             }
           ></Route>
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>

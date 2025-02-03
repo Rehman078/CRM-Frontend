@@ -14,6 +14,8 @@ import {
   Card,
   CardContent,
   Grid,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
 import { addContacts } from "../../services/ContactApi";
 import { useNavigate } from "react-router-dom";
@@ -72,6 +74,11 @@ function AddContact() {
     }
   };
 
+   // Breadcrumb name
+   const breadcrumbItems = [
+    { label: "Dashboard", Link: "/", href: "" },
+    { label: "Add Contact", href: "", isLast: true },
+  ];  
   return (
     <Box sx={{ display: "flex" }}>
       <AppBarComponent
@@ -90,11 +97,35 @@ function AddContact() {
           transition: "margin 0.3s ease",
         }}
       >
+            <Box
+          sx={{
+            marginTop: 8,
+          }}
+        >
+          <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
+            {breadcrumbItems.map((item, index) =>
+              item.isLast ? (
+                <Typography key={index} sx={{ color: "white" }}>
+                  {item.label}
+                </Typography>
+              ) : (
+                <Link
+                  key={index}
+                  underline="hover"
+                  sx={{ color: "#d1c4e9" }}
+                  href={item.href}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
+          </Breadcrumbs>
+        </Box>
         <Toaster position="top-right" reverseOrder={false} />
         <Card
           sx={{
             margin: "auto",
-            marginTop: 10,
+            marginTop: 6,
             maxWidth: 900,
             paddingBlock: 3,
             paddingInline: 2,

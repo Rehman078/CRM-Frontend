@@ -21,8 +21,15 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Collapse,
+  Breadcrumbs,
 } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+import {
+  Edit,
+  Delete,
+  KeyboardArrowUp,
+  KeyboardArrowDown,
+} from "@mui/icons-material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AppBarComponent from "../../components/AppBar";
 import DrawerComponent from "../../components/SideBar";
@@ -46,7 +53,10 @@ function Contact() {
   const handleDrawerClose = () => setOpen(false);
 
   const [openModel, setOpenModel] = useState(false);
-  const [currentContactId, setCurrentContactId] = useState(null); // Store the current contact ID for assignment
+  const [currentContactId, setCurrentContactId] = useState(null);
+
+  // For collapsible table
+  const [openRow, setOpenRow] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdminOrManager = user?.role === "Admin" || user?.role === "Manager";
@@ -123,10 +133,19 @@ function Contact() {
       toast.success("Contact assigned successfully.");
       handleClose();
     } catch (error) {
-      console.error("Error assigning contact:", error.message);
-      toast.error("Error assigning contact.");
+      toast.error("Contact is already Assigned to SaleRep.");
     }
   };
+
+  // Toggle collapsible row
+  const handleToggle = (id) => {
+    setOpenRow((prevOpenRow) => (prevOpenRow === id ? null : id));
+  };
+
+  const breadcrumbItems = [
+    { label: "Dashboard", Link: "/", href: "" },
+    { label: "Contacts", href: "", isLast: true },
+  ];
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -151,10 +170,29 @@ function Contact() {
           sx={{
             marginTop: 8,
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
             width: "100%",
           }}
         >
+          <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
+            {breadcrumbItems.map((item, index) =>
+              item.isLast ? (
+                <Typography key={index} sx={{ color: "white" }}>
+                  {item.label}
+                </Typography>
+              ) : (
+                <Link
+                  key={index}
+                  underline="hover"
+                  sx={{ color: "#d1c4e9" }}
+                  href={item.href}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
+          </Breadcrumbs>
+
           <Link to="/addcontact">
             <Button variant="contained">Add Contact</Button>
           </Link>
@@ -181,8 +219,10 @@ function Contact() {
                 <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Phone</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Assigned</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Created</TableCell>
+                {["Admin", "Manager"].includes(user?.role) && (
+                  <TableCell sx={{ fontWeight: "bold" }}>Assignment</TableCell>
+                )}
                 <TableCell sx={{ fontWeight: "bold" }}>Action</TableCell>
               </TableRow>
             </TableHead>
@@ -195,63 +235,133 @@ function Contact() {
                 </TableRow>
               ) : (
                 contacts.map((contact, index) => (
-                  <TableRow key={contact._id}>
-                    <TableCell sx={{ fontWeight: "bold" }}>
-                      {index + 1}
-                    </TableCell>
-                    <TableCell>{contact.name}</TableCell>
-                    <TableCell>{contact.email}</TableCell>
-                    <TableCell>{contact.phone}</TableCell>
-                    <TableCell>
-                      {contact.assigned_to
-                        ? contact.assigned_to.name
-                        : "Not Assigned"}
-                    </TableCell>
-                    <TableCell>{contact.created_by.name}</TableCell>
-                    <TableCell>
-                      {isAdminOrManager && (
-                        <IconButton
-                          sx={{
-                            border: "2px solid #00796b",
-                            borderRadius: "5px",
-                            padding: "4px",
-                            color: "#00796b",
-                          }}
-                          onClick={() => handleOpen(contact._id)}
-                        >
-                          <AssignmentIcon />
-                        </IconButton>
-                      )}
-                      <Link to={`/editcontact/${contact._id}`}>
-                        <IconButton
-                          color="primary"
-                          sx={{
-                            border: "2px solid #1976d2",
-                            borderRadius: "5px",
-                            padding: "4px",
-                            marginInline: 1,
-                          }}
-                        >
-                          <Edit />
-                        </IconButton>
+                  <React.Fragment key={contact._id}>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        {index + 1}
+                      </TableCell>
+                      <Link
+                        to={`/contactdetail/${contact._id}`}
+                        style={{ textDecoration: "none" }}
+                      >
+                        <TableCell>{contact.name}</TableCell>
                       </Link>
-                      {(contact.created_by.role === "SalesRep" &&
-                        user?.role === "SalesRep") ||
-                      ["Admin", "Manager"].includes(user?.role) ? (
-                        <IconButton
-                          color="secondary"
-                          sx={{
-                            border: "2px solid red",
-                            borderRadius: "5px",
-                            padding: "4px",
-                          }}
-                          onClick={() => handleDelete(contact._id)}
+
+                      <TableCell>{contact.email}</TableCell>
+                      <TableCell>{contact.phone}</TableCell>
+                      <TableCell>{contact.created_by.name}</TableCell>
+                      {["Admin", "Manager"].includes(user?.role) && (
+                        <TableCell>
+                          <IconButton onClick={() => handleToggle(contact._id)}>
+                            {openRow === contact._id ? (
+                              <KeyboardArrowUp />
+                            ) : (
+                              <KeyboardArrowDown />
+                            )}
+                          </IconButton>
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        {isAdminOrManager && (
+                          <IconButton
+                            sx={{
+                              border: "2px solid #00796b",
+                              borderRadius: "5px",
+                              padding: "4px",
+                              color: "#00796b",
+                            }}
+                            onClick={() => handleOpen(contact._id)}
+                          >
+                            <AssignmentIcon />
+                          </IconButton>
+                        )}
+                        <Link to={`/editcontact/${contact._id}`}>
+                          <IconButton
+                            color="primary"
+                            sx={{
+                              border: "2px solid #1976d2",
+                              borderRadius: "5px",
+                              padding: "4px",
+                              marginInline: 1,
+                            }}
+                          >
+                            <Edit />
+                          </IconButton>
+                        </Link>
+                        {(contact.created_by.role === "SalesRep" &&
+                          user?.role === "SalesRep") ||
+                        ["Admin", "Manager"].includes(user?.role) ? (
+                          <IconButton
+                            color="secondary"
+                            sx={{
+                              border: "2px solid red",
+                              borderRadius: "5px",
+                              padding: "4px",
+                            }}
+                            onClick={() => handleDelete(contact._id)}
+                          >
+                            <Delete />
+                          </IconButton>
+                        ) : null}
+                      </TableCell>
+                    </TableRow>
+
+                    {/* Collapsible Table Row */}
+                    <TableRow>
+                      <TableCell colSpan={7} style={{ padding: 0 }}>
+                        <Collapse
+                          in={openRow === contact._id}
+                          timeout="auto"
+                          unmountOnExit
                         >
-                          <Delete />
-                        </IconButton>
-                      ) : null}
-                    </TableCell>
-                  </TableRow>
+                          <Box sx={{ marginInline: 15 }}>
+                            <Table size="small" style={{ marginBlock: "20px" }}>
+                              <TableHead sx={{ backgroundColor: "#9ab6ba" }}>
+                                <TableRow>
+                                  <TableCell sx={{ fontWeight: "bold" }}>
+                                    #
+                                  </TableCell>
+                                  <TableCell sx={{ fontWeight: "bold" }}>
+                                    Name
+                                  </TableCell>
+                                  <TableCell sx={{ fontWeight: "bold" }}>
+                                    Email
+                                  </TableCell>
+                                  <TableCell sx={{ fontWeight: "bold" }}>
+                                    Role
+                                  </TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {contact.assigned_to &&
+                                contact.assigned_to.length > 0 ? (
+                                  contact.assigned_to.map((user, index) => (
+                                    <TableRow key={user._id}>
+                                      <TableCell>{index + 1}</TableCell>
+                                      <TableCell>{user.name}</TableCell>
+                                      <TableCell>{user.email}</TableCell>
+                                      <TableCell>{user.role}</TableCell>
+                                    </TableRow>
+                                  ))
+                                ) : (
+                                  <TableRow>
+                                    <TableCell
+                                      colSpan={8}
+                                      style={{
+                                        textAlign: "center",
+                                      }}
+                                    >
+                                      Not Assigned Contact
+                                    </TableCell>
+                                  </TableRow>
+                                )}
+                              </TableBody>
+                            </Table>
+                          </Box>
+                        </Collapse>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
                 ))
               )}
             </TableBody>

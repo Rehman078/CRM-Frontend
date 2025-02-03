@@ -159,3 +159,28 @@ export const updateContact = async (id, formData) => {
     throw new Error("Error updating contact: " + error.message);
   }
 };
+
+export const getcontactsById = async (id) => {
+  try {
+    if (!id) throw new Error("Invalid ID provided");
+
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const token = user?.token;
+    const role = user?.role;
+
+    const config = {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+        Role: role || "",
+      },
+    };
+
+    const response = await axios.get(`${API_BASE_URL}/contacts/${id}`, config);
+    console.log("Contact Data by id:", response.data);
+    return response.data;
+
+  } catch (error) {
+    console.error("Error fetching contact:", error.response?.data || error.message);
+    throw error;
+  }
+};

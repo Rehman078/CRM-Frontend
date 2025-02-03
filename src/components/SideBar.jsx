@@ -115,27 +115,6 @@ export default function DrawerComponent({ open, handleDrawerClose }) {
         </List>
       </Link>
       <Divider />
-      <Link to={"/file"}>
-        <List>
-          <ListItem disablePadding sx={{ display: "block" }}>
-            <ListItemButton sx={{ minHeight: 48, px: 2.5 }}>
-              <ListItemIcon
-                sx={{ minWidth: 0, justifyContent: "center", color: "white" }}
-              >
-                <TextSnippetIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary="File"
-                sx={{
-                  paddingLeft: open ? 2 : 4,
-                  color: "white",
-                }}
-              />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </Link>
-      <Divider />
       <Link to={"/lead"}>
         <List>
           <ListItem disablePadding sx={{ display: "block" }}>

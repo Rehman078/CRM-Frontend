@@ -13,6 +13,8 @@ import {
   Card,
   CardContent,
   Grid,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContaxt";
@@ -76,6 +78,11 @@ function EditContact() {
     }
   };
 
+     // Breadcrumb name
+     const breadcrumbItems = [
+      { label: "Dashboard", Link: "/", href: "" },
+      { label: "Edit Lead", href: "", isLast: true },
+    ];
   return (
     <Box sx={{ display: "flex" }}>
       <AppBarComponent
@@ -95,10 +102,34 @@ function EditContact() {
           transition: "margin 0.3s ease",
         }}
       >
+            <Box
+          sx={{
+            marginTop: 8,
+          }}
+        >
+          <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
+            {breadcrumbItems.map((item, index) =>
+              item.isLast ? (
+                <Typography key={index} sx={{ color: "white" }}>
+                  {item.label}
+                </Typography>
+              ) : (
+                <Link
+                  key={index}
+                  underline="hover"
+                  sx={{ color: "#d1c4e9" }}
+                  href={item.href}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
+          </Breadcrumbs>
+        </Box>
         <Card
           sx={{
             margin: "auto",
-            marginTop: 10,
+            marginTop: 6,
             maxWidth: 900,
             paddingBlock: 3,
             paddingInline: 2,
