@@ -29,6 +29,7 @@ function AddContact() {
   const handleDrawerClose = () => setOpen(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
+
   // Form data state
   const [formData, setFormData] = useState({
     name: "",
@@ -38,6 +39,7 @@ function AddContact() {
     company: "",
     tags: [],
   });
+
   //logout function
   const handleLogout = () => {
     logout();
@@ -67,18 +69,18 @@ function AddContact() {
     }
 
     try {
-      const response = await addContacts(formData);
+      await addContacts(formData);
       toast.success("Contact added successfully!");
     } catch (error) {
       toast.error("Failed to add contact. Please try again.");
     }
   };
 
-   // Breadcrumb name
-   const breadcrumbItems = [
+  // Breadcrumb name
+  const breadcrumbItems = [
     { label: "Dashboard", Link: "/", href: "" },
     { label: "Add Contact", href: "", isLast: true },
-  ];  
+  ];
   return (
     <Box sx={{ display: "flex" }}>
       <AppBarComponent
@@ -97,22 +99,23 @@ function AddContact() {
           transition: "margin 0.3s ease",
         }}
       >
-            <Box
+        <Box
           sx={{
             marginTop: 8,
           }}
         >
+          {/* Breadcrum */}
           <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
             {breadcrumbItems.map((item, index) =>
               item.isLast ? (
-                <Typography key={index} sx={{ color: "white" }}>
+                <Typography key={index} sx={{ color: "#1F283E" }}>
                   {item.label}
                 </Typography>
               ) : (
                 <Link
                   key={index}
                   underline="hover"
-                  sx={{ color: "#d1c4e9" }}
+                  sx={{ color: "#a5bae5" }}
                   href={item.href}
                 >
                   {item.label}
@@ -121,6 +124,7 @@ function AddContact() {
             )}
           </Breadcrumbs>
         </Box>
+
         <Toaster position="top-right" reverseOrder={false} />
         <Card
           sx={{
@@ -226,7 +230,15 @@ function AddContact() {
                     width: "100%",
                   }}
                 >
-                  <Button type="submit" variant="contained">
+                  <Button
+                    type="submit"
+                    sx={{
+                      backgroundColor: "#a5bae5",
+                      color: "#1f283e",
+                      paddingInline: 2,
+                      paddingBlock: 1,
+                    }}
+                  >
                     Add Contact
                   </Button>
                 </Box>

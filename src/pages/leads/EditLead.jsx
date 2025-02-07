@@ -24,7 +24,7 @@ function EditLead() {
   const [open, setOpen] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const { id } = useParams(); 
+  const { id } = useParams();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -33,22 +33,10 @@ function EditLead() {
     status: "New",
   });
 
-  useEffect(() => {
-
-    const fetchLead = async () => {
-      try {
-        const response = await getLeadsById(id);
-        setFormData(response.data);
-      } catch (error) {
-        toast.error("Failed to fetch lead.");
-      }
-    };
-    fetchLead();
-  }, [id]);
-
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setFormData({ ...formData, [name]: value });
   };
 
@@ -59,7 +47,8 @@ function EditLead() {
       !formData.name ||
       !formData.contactinfo ||
       !formData.leadsource ||
-      !formData.status
+      !formData.status ||
+      "New"
     ) {
       toast.error("All fields are required.");
       return;
@@ -73,11 +62,23 @@ function EditLead() {
     }
   };
 
-     // Breadcrumb name
-      const breadcrumbItems = [
-        { label: "Dashboard", Link: "/", href: "" },
-        { label: "Edit Lead", href: "", isLast: true },
-      ];
+  useEffect(() => {
+    const fetchLead = async () => {
+      try {
+        const response = await getLeadsById(id);
+        setFormData(response.data[0]);
+      } catch (error) {
+        toast.error("Failed to fetch lead.");
+      }
+    };
+    fetchLead();
+  }, [id]);
+
+  // Breadcrumb name
+  const breadcrumbItems = [
+    { label: "Dashboard", Link: "/", href: "" },
+    { label: "Edit Lead", href: "", isLast: true },
+  ];
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -97,7 +98,7 @@ function EditLead() {
           transition: "margin 0.3s ease",
         }}
       >
-            <Box
+        <Box
           sx={{
             marginTop: 8,
             display: "flex",
@@ -108,14 +109,14 @@ function EditLead() {
           <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
             {breadcrumbItems.map((item, index) =>
               item.isLast ? (
-                <Typography key={index} sx={{ color: "white" }}>
+                <Typography key={index} sx={{ color: "#1F283E" }}>
                   {item.label}
                 </Typography>
               ) : (
                 <Link
                   key={index}
                   underline="hover"
-                  sx={{ color: "#d1c4e9" }}
+                  sx={{ color: "#a5bae5" }}
                   href={item.href}
                 >
                   {item.label}
@@ -185,7 +186,15 @@ function EditLead() {
                     width: "100%",
                   }}
                 >
-                  <Button type="submit" variant="contained">
+                  <Button
+                    type="submit"
+                    sx={{
+                      backgroundColor: "#a5bae5",
+                      color: "#1f283e",
+                      paddingInline: 2,
+                      paddingBlock: 1,
+                    }}
+                  >
                     Update Lead
                   </Button>
                 </Box>

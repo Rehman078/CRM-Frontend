@@ -10,6 +10,7 @@ import SingleContact from "./pages/contacts/SingleContact";
 import Lead from "./pages/leads/Lead";
 import AddLead from "./pages/leads/AddLead";
 import EditLead from "./pages/leads/EditLead";
+import SingleLead from "./pages/leads/SingleLead";
 function App() {
   return (
     <AuthProvider>
@@ -55,7 +56,7 @@ function App() {
             path="/contactdetail/:id"
             element={
               <ProtectedRoute>
-              <SingleContact/>
+                <SingleContact />
               </ProtectedRoute>
             }
           />
@@ -85,7 +86,14 @@ function App() {
               </ProtectedRoute>
             }
           ></Route>
-
+          <Route
+            path="/leaddetail/:id"
+            element={
+              <ProtectedRoute>
+                <SingleLead />
+              </ProtectedRoute>
+            }
+          ></Route>
         </Routes>
       </BrowserRouter>
     </AuthProvider>

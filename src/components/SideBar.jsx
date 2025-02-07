@@ -1,7 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Typography } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
-import ContactsIcon from "@mui/icons-material/Contacts";
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import Person from '@mui/icons-material/Person';
+import TrendingUp from '@mui/icons-material/TrendingUp';
 import MuiDrawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -11,9 +14,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
 import Divider from "@mui/material/Divider";
-import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 
 const drawerWidth = 240;
 const closedWidth = 70;
@@ -53,7 +54,7 @@ const Drawer = styled(MuiDrawer)(({ theme, open }) => ({
   whiteSpace: "nowrap",
   boxSizing: "border-box",
   "& .MuiDrawer-paper": {
-    backgroundColor: "#3f51b5",
+    backgroundColor: "#f0efef",
     ...(open ? openedMixin(theme) : closedMixin(theme)),
   },
 }));
@@ -66,9 +67,9 @@ export default function DrawerComponent({ open, handleDrawerClose }) {
       <DrawerHeader>
         <IconButton onClick={handleDrawerClose}>
           {theme.direction === "rtl" ? (
-            <ChevronRightIcon />
+            <ChevronRightIcon style={{ color: "#1f283e" }} />
           ) : (
-            <ChevronLeftIcon />
+            <ChevronLeftIcon style={{ color: "#1f283e" }} />
           )}
         </IconButton>
       </DrawerHeader>
@@ -80,13 +81,13 @@ export default function DrawerComponent({ open, handleDrawerClose }) {
               <ListItemIcon
                 sx={{ minWidth: 0, justifyContent: "center", color: "white" }}
               >
-                <InboxIcon />
+                <DashboardIcon sx={{ color: "#1f283e", fontSize: 30 }} />
               </ListItemIcon>
               <ListItemText
                 primary="Dashboard"
                 sx={{
                   paddingLeft: open ? 2 : 4,
-                  color: "white",
+                  color: "#1f283e",
                 }}
               />
             </ListItemButton>
@@ -101,13 +102,13 @@ export default function DrawerComponent({ open, handleDrawerClose }) {
               <ListItemIcon
                 sx={{ minWidth: 0, justifyContent: "center", color: "white" }}
               >
-                <ContactsIcon />
+                <Person sx={{ color: "#1f283e", fontSize: 30 }} />
               </ListItemIcon>
               <ListItemText
                 primary="Contact"
                 sx={{
                   paddingLeft: open ? 2 : 4,
-                  color: "white",
+                  color: "#1f283e",
                 }}
               />
             </ListItemButton>
@@ -122,13 +123,13 @@ export default function DrawerComponent({ open, handleDrawerClose }) {
               <ListItemIcon
                 sx={{ minWidth: 0, justifyContent: "center", color: "white" }}
               >
-                <TextSnippetIcon />
+                <TrendingUp sx={{ color: "#1f283e", fontSize: 30 }} />
               </ListItemIcon>
               <ListItemText
                 primary="Lead"
                 sx={{
                   paddingLeft: open ? 2 : 4,
-                  color: "white",
+                  color: "#1f283e",
                 }}
               />
             </ListItemButton>

@@ -1,6 +1,6 @@
 import axios from "axios";
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { getConfig } from "../utilities/ConfigApi";
 
 export const loginUser = async (credentials) => {
   try {
@@ -14,16 +14,7 @@ export const loginUser = async (credentials) => {
 
 export const getUsers = async () => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
+    const config = getConfig();
     const response = await axios.get(`${API_BASE_URL}/users`, config);
     return response.data;
   } catch (error) {

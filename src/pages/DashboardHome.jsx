@@ -1,15 +1,15 @@
-import  {React, useState} from "react";
+import { React, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContaxt";
-import { Box, Typography } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import AppBarComponent from "../components/AppBar";
 import DrawerComponent from "../components/SideBar";
-
+import CardComponent from "../components/CardComponent";
 export default function MiniDrawer() {
   const [open, setOpen] = useState(false);
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
-  
+
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -18,6 +18,13 @@ export default function MiniDrawer() {
     logout();
     navigate("/");
   };
+
+  const cardData = [
+    { title: "User", content: "Manage CRM users." },
+    { title: "Contact", content: "Manage your contacts." },
+    { title: "Lead", content: "Track potential customers." },
+    { title: "Opportunity", content: "Identify new business deals." },
+  ];
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -37,12 +44,18 @@ export default function MiniDrawer() {
           transition: "margin 0.3s ease",
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{ backgroundColor: "#f4f4f4", marginTop: 8 }}
+        <Grid
+          container
+          spacing={5}
+          justifyContent="center"
+          sx={{ marginTop: 6 }}
         >
-          Dashboard
-        </Typography>
+          {cardData.map((card, index) => (
+            <Grid item key={index}>
+              <CardComponent title={card.title} content={card.content} />
+            </Grid>
+          ))}
+        </Grid>
       </Box>
     </Box>
   );

@@ -4,13 +4,6 @@ import {
   Button,
   Breadcrumbs,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   CircularProgress,
   IconButton,
   Modal,
@@ -18,17 +11,13 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Collapse,
 } from "@mui/material";
+import MUIDataTable from "mui-datatables";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast, Toaster } from "react-hot-toast";
-import {
-  Edit,
-  Delete,
-  KeyboardArrowUp,
-  KeyboardArrowDown,
-} from "@mui/icons-material";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { useAuth } from "../../context/AuthContaxt";
 import AppBarComponent from "../../components/AppBar";
@@ -41,16 +30,12 @@ function Lead() {
   const [open, setOpen] = React.useState(false);
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
-  const [loading, setLoading] = useState(true);
   const [openModel, setOpenModel] = useState(false);
   const [currentLeadId, setCurrentLeadId] = useState(null);
   const [users, setUsers] = useState([]);
   const [assignedUsers, setAssignedUsers] = useState([]);
   const { logout } = useAuth();
   const navigate = useNavigate();
-
-  // For collapsible table
-  const [openRow, setOpenRow] = useState(null);
 
   // For delete button
   const user = JSON.parse(localStorage.getItem("user"));
@@ -62,6 +47,39 @@ function Lead() {
     navigate("/");
   };
 
+  //assignmetn model
+  const handleOpen = (leadId) => {
+    setCurrentLeadId(leadId);
+    setOpenModel(true);
+  };
+  const handleClose = () => {
+    setOpenModel(false);
+    setCurrentLeadId(null);
+  };
+
+  // Delete lead
+  const handleDelete = async (id) => {
+    try {
+      await deleteLead(id);
+      setLeads((prevLeads) => prevLeads.filter((lead) => lead._id !== id));
+      toast.success("Lead deleted successfully.");
+    } catch (error) {
+      toast.error("Error deleting lead.");
+    }
+  };
+
+  // Assign contact to users
+  const handleAssignLead = async () => {
+    try {
+      await assignLead(currentLeadId, assignedUsers);
+      toast.success("Lead assigned successfully.");
+      setOpenModel(false);
+      setCurrentLeadId(null);
+    } catch (error) {
+      toast.error("Lead is already Assigned to SaleRep.");
+    }
+  };
+
   // Get leads and users
   useEffect(() => {
     const fetchLeads = async () => {
@@ -69,9 +87,7 @@ function Lead() {
         const response = await getLeads();
         setLeads(response.data);
       } catch (error) {
-        setLoading(false);
-      } finally {
-        setLoading(false);
+        console.error("not fetching leads");
       }
     };
 
@@ -90,49 +106,137 @@ function Lead() {
     fetchLeads();
   }, []);
 
-  const handleOpen = (leadId) => {
-    setCurrentLeadId(leadId);
-    setOpenModel(true);
-  };
-
-  const handleClose = () => {
-    setOpenModel(false);
-    setCurrentLeadId(null);
-  };
-
-  // Delete lead
-  const handleDelete = async (id) => {
-    try {
-      await deleteLead(id);
-      setLeads((prevLeads) => prevLeads.filter((lead) => lead._id !== id));
-      toast.success("Lead deleted successfully.");
-    } catch (error) {
-      toast.error("Error deleting lead.");
-    }
-  };
-
-  // Assign contact to users
-  const handleAssignContact = async () => {
-    try {
-      await assignLead(currentLeadId, assignedUsers);
-      toast.success("Lead assigned successfully.");
-      setOpenModel(false);
-      setCurrentLeadId(null);
-    } catch (error) {
-     toast.error("Lead is already Assigned to SaleRep.");
-    }
-  };
-
-  // Toggle collapsible row
-  const handleToggle = (id) => {
-    setOpenRow((prevOpenRow) => (prevOpenRow === id ? null : id));
-  };
-
   // Breadcrumb name
   const breadcrumbItems = [
     { label: "Dashboard", Link: "/", href: "" },
     { label: "Leads", href: "", isLast: true },
   ];
+
+  // table data get
+  const columns = [
+    {
+      name: "id",
+      label: "ID",
+      options: {
+        customBodyRenderLite: (dataIndex) => {
+          return <div>{dataIndex + 1}</div>;
+        },
+      },
+    },
+    {
+      name: "name",
+      label: "Lead Name",
+      options: {
+        customBodyRenderLite: (dataIndex) => {
+          const lead = leads[dataIndex];
+          return (
+            <div>
+              <Link
+                to={`/leaddetail/${lead._id}`}
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                {lead.name}
+              </Link>
+            </div>
+          );
+        },
+      },
+    },
+    {
+      name: "contactinfo",
+      label: "Lead Contact",
+      options: {
+        customBodyRenderLite: (dataIndex) => {
+          const lead = leads[dataIndex];
+          return <div>{lead.contactinfo}</div>;
+        },
+      },
+    },
+    {
+      name: "leadsource",
+      label: "Lead Source",
+      options: {
+        customBodyRenderLite: (dataIndex) => {
+          const lead = leads[dataIndex];
+          return <div>{lead.leadsource}</div>;
+        },
+      },
+    },
+    {
+      name: "status",
+      label: "Status",
+      options: {
+        customBodyRenderLite: (dataIndex) => {
+          const lead = leads[dataIndex];
+          return <div>{lead.status}</div>;
+        },
+      },
+    },
+    {
+      name: "created_by",
+      label: "Created",
+      options: {
+        customBodyRenderLite: (dataIndex) => {
+          const lead = leads[dataIndex];
+          return <div>{lead.created_by?.name || "Unknown"}</div>;
+        },
+      },
+    },
+    {
+      name: "actions",
+      label: "Actions",
+      options: {
+        customBodyRenderLite: (dataIndex) => {
+          const lead = leads[dataIndex];
+          return (
+            <div>
+              {isAdminOrManager && (
+                <IconButton
+                  sx={{ paddingRight: "14px" }}
+                  onClick={() => handleOpen(lead._id)}
+                >
+                  <AssignmentIcon sx={{ color: "#1f283e", fontSize: "27px" }} />
+                </IconButton>
+              )}
+              <Link to={`/editlead/${lead._id}`}>
+                <IconButton color="primary">
+                  <BorderColorOutlinedIcon
+                    sx={{ color: "blue", fontSize: 26 }}
+                  />
+                </IconButton>
+              </Link>
+              {lead.created_by.id === user?.id ||
+              ["Admin", "Manager"].includes(user?.role) ? (
+                <IconButton
+                  color="secondary"
+                  onClick={() => handleDelete(lead._id)}
+                >
+                  <DeleteOutlineOutlinedIcon
+                    sx={{ color: "red", fontSize: 30 }}
+                  />
+                </IconButton>
+              ) : null}
+            </div>
+          );
+        },
+      },
+    },
+  ];
+
+  const options = {
+    filter: true,
+    filterType: "dropdown",
+    responsive: "standard",
+    selectableRows: "none",
+    rowsPerPage: 10,
+    rowsPerPageOptions: [5, 10, 25, 50],
+    search: true,
+    download: false,
+    print: false,
+    viewColumns: true,
+    pagination: true,
+    sort: true,
+  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -163,17 +267,17 @@ function Lead() {
             width: "100%",
           }}
         >
-          <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
+          <Breadcrumbs aria-label="breadcrumb">
             {breadcrumbItems.map((item, index) =>
               item.isLast ? (
-                <Typography key={index} sx={{ color: "white" }}>
+                <Typography key={index} sx={{ color: "#1F283E" }}>
                   {item.label}
                 </Typography>
               ) : (
                 <Link
                   key={index}
                   underline="hover"
-                  sx={{ color: "#d1c4e9" }}
+                  sx={{ color: "#a5bae5" }}
                   href={item.href}
                 >
                   {item.label}
@@ -183,169 +287,27 @@ function Lead() {
           </Breadcrumbs>
 
           <Link to="/addlead">
-            <Button variant="contained">Add Lead</Button>
+            <Button
+              sx={{
+                backgroundColor: "#a5bae5",
+                color: "#1f283e",
+                paddingInline: 2,
+                paddingBlock: 1,
+              }}
+            >
+              Add Lead
+            </Button>
           </Link>
         </Box>
-        {loading && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "90vh",
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        )}
 
         {/* Table Container */}
-        <TableContainer
-  component={Paper}
->
-  <Table>
-    <TableHead>
-      <TableRow>
-        <TableCell sx={{ fontWeight: "bold" }}>#</TableCell>
-        <TableCell sx={{ fontWeight: "bold" }}>Lead Name</TableCell>
-        <TableCell sx={{ fontWeight: "bold" }}>Lead Contact</TableCell>
-        <TableCell sx={{ fontWeight: "bold" }}>Lead Source</TableCell>
-        <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
-        <TableCell sx={{ fontWeight: "bold" }}>Created</TableCell>
-        {["Admin", "Manager"].includes(user?.role) && (
-          <TableCell sx={{ fontWeight: "bold" }}>Assignment</TableCell>
-        )}
-        <TableCell sx={{ fontWeight: "bold" }}>Action</TableCell>
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {leads.length === 0 && !loading ? (
-        <TableRow>
-          <TableCell colSpan={9} align="center">
-            No leads available
-          </TableCell>
-        </TableRow>
-      ) : (
-        leads.map((lead, index) => (
-          <React.Fragment key={lead._id}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>{index + 1}</TableCell>
-              <TableCell>{lead.name}</TableCell>
-              <TableCell>{lead.contactinfo}</TableCell>
-              <TableCell>{lead.leadsource}</TableCell>
-              <TableCell>{lead.status}</TableCell>
-              <TableCell>{lead.created_by.name}</TableCell>
-              {["Admin", "Manager"].includes(user?.role) && (
-                <TableCell>
-                  <IconButton onClick={() => handleToggle(lead._id)}>
-                    {openRow === lead._id ? (
-                      <KeyboardArrowUp />
-                    ) : (
-                      <KeyboardArrowDown />
-                    )}
-                  </IconButton>
-                </TableCell>
-              )}
-              <TableCell>
-                {isAdminOrManager && (
-                  <IconButton
-                    sx={{
-                      border: "2px solid #00796b",
-                      borderRadius: "5px",
-                      padding: "4px",
-                      color: "#00796b",
-                    }}
-                    onClick={() => handleOpen(lead._id)}
-                  >
-                    <AssignmentIcon />
-                  </IconButton>
-                )}
-                <Link to={`/editlead/${lead._id}`}>
-                  <IconButton
-                    color="primary"
-                    sx={{
-                      border: "2px solid #1976d2",
-                      borderRadius: "5px",
-                      padding: "4px",
-                      marginInline: 1,
-                    }}
-                  >
-                    <Edit />
-                  </IconButton>
-                </Link>
 
-                {(lead.created_by.role === "SalesRep" &&
-                  user?.role === "SalesRep") ||
-                ["Admin", "Manager"].includes(user?.role) ? (
-                  <IconButton
-                    color="secondary"
-                    sx={{
-                      border: "2px solid red",
-                      borderRadius: "5px",
-                      padding: "4px",
-                    }}
-                    onClick={() => handleDelete(lead._id)}
-                  >
-                    <Delete />
-                  </IconButton>
-                ) : null}
-              </TableCell>
-              
-            </TableRow>
-            {/* Collapsible Table Row */}
-            <TableRow>
-              <TableCell colSpan={8}  style={{ padding: 0 }}>
-                <Collapse
-                  in={openRow === lead._id}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <Box sx={{marginInline: 15}}>
-                  <Table
-                    size="small"
-                    style={{  marginBlock: "20px" }}
-                  >
-                    <TableHead sx={{ backgroundColor: "#9ab6ba" }}>
-                      <TableRow>
-                        <TableCell sx={{ fontWeight: "bold" }}>#</TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {lead.assigned_to && lead.assigned_to.length > 0 ? (
-                        lead.assigned_to.map((user, index) => (
-                          <TableRow key={user.id}>
-                            <TableCell>{index + 1}</TableCell>
-                            <TableCell>{user.name}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell
-                            colSpan={7}
-                            style={{
-                              textAlign: "center",
-                            }}
-                          >
-                            Not Assigned Lead
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                  </Box>
-                </Collapse>
-              </TableCell>
-            </TableRow>
-          </React.Fragment>
-        ))
-      )}
-    </TableBody>
-  </Table>
-</TableContainer>
-
+        <MUIDataTable
+          title="Lead List"
+          data={leads}
+          columns={columns}
+          options={options}
+        />
 
         {/* Assignment Modal */}
         <Modal
@@ -396,12 +358,20 @@ function Lead() {
             <Box sx={{ textAlign: "end", marginTop: 2 }}>
               <Button
                 variant="outlined"
-                sx={{ marginRight: 1 }}
+                sx={{ marginRight: 1, color: "#1f283e" }}
                 onClick={handleClose}
               >
                 Cancel
               </Button>
-              <Button variant="contained" onClick={handleAssignContact}>
+              <Button
+                sx={{
+                  backgroundColor: "#a5bae5",
+                  color: "#1f283e",
+                  paddingInline: 2,
+                  paddingBlock: 1,
+                }}
+                onClick={handleAssignLead}
+              >
                 Assign
               </Button>
             </Box>

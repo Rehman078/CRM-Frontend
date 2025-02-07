@@ -4,9 +4,9 @@ import FilePresentIcon from "@mui/icons-material/FilePresent";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { deepOrange } from "@mui/material/colors";
 import { DataGrid } from "@mui/x-data-grid";
-import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Box,
   Paper,
@@ -31,15 +31,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import AppBarComponent from "../../components/AppBar";
 import DrawerComponent from "../../components/SideBar";
 import { useAuth } from "../../context/AuthContaxt";
-import { getcontactsById } from "../../services/ContactApi";
+import { getLeadsById } from "../../services/LeadApi";
 import { addNote } from "../../services/NoteApi";
 import {
   addFiles,
-  getFilesByContactId,
+  getFilesByLeadId,
   deleteFileById,
 } from "../../services/FileApi";
 
-function SingleContact() {
+function SingleLead() {
   const user = JSON.parse(localStorage.getItem("user"));
 
   //for dashboard
@@ -47,13 +47,10 @@ function SingleContact() {
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
   const { logout } = useAuth();
-
-  //for navigation
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [contact, setContact] = useState(null);
-  const [files, setFiles] = useState([]);
+  const [lead, setLead] = useState(null);
 
   //tab value
   const [value, setValue] = useState("1");
@@ -61,16 +58,19 @@ function SingleContact() {
   //for add note
   const [note, setNote] = useState({
     note: "",
-    note_type: "Contact",
+    note_type: "Lead",
     note_to: id,
   });
 
   //for add file
   const [fileData, setFileData] = useState({
     files: [],
-    source: "Contact",
+    source: "Lead",
     source_id: id,
   });
+
+  //for file geting
+  const [files, setFiles] = useState([]);
 
   //change tab value
   const handleChange = (event, newValue) => {
@@ -112,13 +112,12 @@ function SingleContact() {
   };
 
   //for add files
-  const handleFilesSubmit = async (event) => {
-    event.preventDefault();
+  const handleFilesSubmit = async (e) => {
+    e.preventDefault();
     if (fileData.files.length === 0) {
       toast.error("Please select at least one file.");
       return;
     }
-
     try {
       const formData = new FormData();
       // Append files
@@ -130,10 +129,9 @@ function SingleContact() {
       formData.append("source_id", fileData.source_id);
 
       await addFiles(formData);
-
+      fetchFile();
       toast.success("Files uploaded successfully!");
       setFileData({ ...fileData, files: [] });
-      fetchFile();
     } catch (error) {
       toast.error("Failed to upload files.");
     }
@@ -142,13 +140,12 @@ function SingleContact() {
   //fetch file
   const fetchFile = async () => {
     try {
-      const response = await getFilesByContactId(id);
+      const response = await getFilesByLeadId(id);
       setFiles(response.data);
     } catch (error) {
       console.error("Error fetching file:", error);
     }
   };
-
   //file delete
   const handleFileDelete = async (fileId) => {
     try {
@@ -160,20 +157,18 @@ function SingleContact() {
       toast.error("Error deleting File.");
     }
   };
-
   // Fetch contact data using getcontactsById
   useEffect(() => {
-    const fetchContact = async () => {
+    const fetchLead = async () => {
       try {
-        const data = await getcontactsById(id);
-        setContact(data.data[0]);
+        const data = await getLeadsById(id);
+        setLead(data.data[0]);
       } catch (error) {
-        console.error("Error fetching contact:", error);
+        console.error("Error fetching lead:", error);
       }
     };
-
-    fetchContact();
     fetchFile();
+    fetchLead();
   }, [id]);
 
   const columns = [
@@ -214,12 +209,12 @@ function SingleContact() {
     {
       field: "createdAt",
       headerName: "Created At",
-      width: 150,
+      width: 100,
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 100,
+      width: 85,
       renderCell: (params) => {
         return (params.row.uploaded_by_role === "SalesRep" &&
           user?.role === "SalesRep") ||
@@ -244,7 +239,6 @@ function SingleContact() {
     uploaded_by_role: file.uploaded_by.role,
     createdAt: new Date(file.createdAt).toLocaleDateString(),
   }));
-
   return (
     <Box sx={{ display: "flex" }}>
       <AppBarComponent
@@ -278,38 +272,35 @@ function SingleContact() {
         >
           <Grid container spacing={2}>
             <Grid item xs={5}>
-              {contact ? (
+              {lead ? (
                 <>
                   <Typography variant="h5" fontWeight="bold" gutterBottom>
-                    Contact Details
+                    Lead Details
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 2 }}>
-                    <strong>Name:</strong> {contact.name}
+                    <strong>Name:</strong> {lead.name}
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 2 }}>
-                    <strong>Email:</strong> {contact.email}
+                    <strong>Contact Info:</strong> {lead.contactinfo}
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 2 }}>
-                    <strong>Contact No:</strong> {contact.phone}
+                    <strong>Lead Source:</strong> {lead.leadsource}
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 2 }}>
-                    <strong>Address:</strong> {contact.address}
-                  </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
-                    <strong>Company Name:</strong> {contact.company}
+                    <strong>Status:</strong> {lead.status}
                   </Typography>
                   <Typography variant="body1">
-                    <strong>Created By:</strong> {contact.created_by.name}
+                    <strong>Created By:</strong> {lead.created_by.name}
                   </Typography>
 
                   {/* Displaying multiple assigned people */}
-                  {contact.assigned_to && contact.assigned_to.length > 0 ? (
+                  {lead.assigned_to && lead.assigned_to.length > 0 ? (
                     <>
                       <Typography variant="body1" sx={{ mt: 1 }}>
                         <strong>Assigned To:</strong>
                       </Typography>
                       <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                        {contact.assigned_to.map((person, index) => (
+                        {lead.assigned_to.map((person, index) => (
                           <Tooltip key={index} title={person.name} arrow>
                             <Avatar sx={{ bgcolor: deepOrange[500] }}>
                               {person.name.split("")[0]}{" "}
@@ -361,7 +352,6 @@ function SingleContact() {
                       }}
                     >
                       <form onSubmit={handleNoteSubmit}>
-                        {/* Note textarea */}
                         <Box
                           sx={{
                             display: "flex",
@@ -458,11 +448,11 @@ function SingleContact() {
                         </List>
                       )}
                       <Box
-                        sx={{ width: "100%", marginTop: 4, height: "300px" }}
+                        sx={{ width: "100%", height: "300px", marginTop: 4 }}
                       >
                         {rows.length === 0 ? (
                           <Box sx={{ textAlign: "center", marginTop: 5 }}>
-                            No files available, for this contact.
+                            No files available for this lead.
                           </Box>
                         ) : (
                           <DataGrid
@@ -486,4 +476,4 @@ function SingleContact() {
   );
 }
 
-export default SingleContact;
+export default SingleLead;

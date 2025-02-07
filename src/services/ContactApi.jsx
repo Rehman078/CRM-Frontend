@@ -1,20 +1,10 @@
 import axios from "axios";
-
+import { getConfig } from "../utilities/ConfigApi";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const getContacts = async () => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
-
+    const config = getConfig();
     const response = await axios.get(`${API_BASE_URL}/contacts/`, config);
     return response.data;
   } catch (error) {
@@ -26,17 +16,7 @@ export const getContacts = async () => {
 
 export const addContacts = async (formData) => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
-
+    const config = getConfig();
     const response = await axios.post(
       `${API_BASE_URL}/contacts/`,
       formData,
@@ -52,18 +32,7 @@ export const addContacts = async (formData) => {
 
 export const deleteContacts = async (id) => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
-
-    // Fixing the URL by directly embedding the id
+    const config = getConfig();
     const response = await axios.delete(
       `${API_BASE_URL}/contacts/${id}`,
       config
@@ -80,17 +49,7 @@ export const deleteContacts = async (id) => {
 // Updated assignContact function
 export const assignContact = async (contactId, assignedUsers) => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
-
+    const config = getConfig();
     const response = await axios.patch(
       `${API_BASE_URL}/contacts/assign/${contactId}`,
       { salerep_ids: assignedUsers },
@@ -107,17 +66,7 @@ export const assignContact = async (contactId, assignedUsers) => {
 
 export const getContactsById = async () => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
-
+    const config = getConfig();
     const response = await axios.get(`${API_BASE_URL}/contacts/`, config);
 
     console.log("API Response:", response.data);
@@ -139,16 +88,7 @@ export const getContactsById = async () => {
 
 export const updateContact = async (id, formData) => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
+    const config = getConfig();
     const response = await axios.put(
       `${API_BASE_URL}/contacts/${id}`,
       formData,
@@ -164,23 +104,15 @@ export const getcontactsById = async (id) => {
   try {
     if (!id) throw new Error("Invalid ID provided");
 
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
-
+    const config = getConfig();
     const response = await axios.get(`${API_BASE_URL}/contacts/${id}`, config);
     console.log("Contact Data by id:", response.data);
     return response.data;
-
   } catch (error) {
-    console.error("Error fetching contact:", error.response?.data || error.message);
+    console.error(
+      "Error fetching contact:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };

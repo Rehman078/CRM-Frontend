@@ -1,20 +1,10 @@
 import axios from "axios";
-
+import { getConfig } from "../utilities/ConfigApi";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const getLeads = async () => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
-
+    const config = getConfig();
     const response = await axios.get(`${API_BASE_URL}/leads/`, config);
     return response.data;
   } catch (error) {
@@ -26,17 +16,7 @@ export const getLeads = async () => {
 
 export const addleads = async (formData) => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
-
+    const config = getConfig();
     const response = await axios.post(
       `${API_BASE_URL}/leads/`,
       formData,
@@ -52,17 +32,7 @@ export const addleads = async (formData) => {
 
 export const deleteLead = async (id) => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
-
+    const config = getConfig();
     const response = await axios.delete(`${API_BASE_URL}/leads/${id}`, config);
     return response.data;
   } catch (error) {
@@ -73,19 +43,8 @@ export const deleteLead = async (id) => {
 };
 
 export const getLeadsById = async (id) => {
-
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
-
+    const config = getConfig();
     const response = await axios.get(`${API_BASE_URL}/leads/${id}`, config);
     return response.data;
   } catch (error) {
@@ -97,17 +56,7 @@ export const getLeadsById = async (id) => {
 
 export const updateLead = async (id, formData) => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-    };
-
+    const config = getConfig();
     const response = await axios.put(
       `${API_BASE_URL}/leads/${id}`,
       formData,
@@ -123,17 +72,7 @@ export const updateLead = async (id, formData) => {
 
 export const assignLead = async (leadId, assignedUsers) => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-        "Content-Type": "application/json",
-      },
-    };
+    const config = getConfig();
 
     const response = await axios.patch(
       `${API_BASE_URL}/leads/assign/${leadId}`,

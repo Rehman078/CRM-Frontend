@@ -27,7 +27,7 @@ function AddLead() {
   const handleDrawerClose = () => setOpen(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
-  
+
   // Form data state
   const [formData, setFormData] = useState({
     name: "",
@@ -50,24 +50,29 @@ function AddLead() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  if (!formData.name || !formData.contactinfo || !formData.leadsource || !formData.status) {
-       toast.error("Name, Contact Info, Lead Source and Status are required.");
-       return;
-     }
-     try{
+    if (
+      !formData.name ||
+      !formData.contactinfo ||
+      !formData.leadsource ||
+      !formData.status
+    ) {
+      toast.error("Name, Contact Info, Lead Source and Status are required.");
+      return;
+    }
+    try {
       await addleads(formData);
       toast.success("Lead added successfully.");
-     }catch(error){
-        toast.error("Failed to add lead.");
-      }
+    } catch (error) {
+      toast.error("Failed to add lead.");
+    }
   };
 
-    // Breadcrumb name
-    const breadcrumbItems = [
-      { label: "Dashboard", Link: "/", href: "" },
-      { label: "Add Lead", href: "", isLast: true },
-    ];
-  
+  // Breadcrumb name
+  const breadcrumbItems = [
+    { label: "Dashboard", Link: "/", href: "" },
+    { label: "Add Lead", href: "", isLast: true },
+  ];
+
   return (
     <Box sx={{ display: "flex" }}>
       <AppBarComponent
@@ -86,27 +91,26 @@ function AddLead() {
           transition: "margin 0.3s ease",
         }}
       >
-        
         <Toaster position="top-right" reverseOrder={false} />
         <Box sx={{ paddingTop: 8 }}>
-        <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9",  }}>
+          <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
             {breadcrumbItems.map((item, index) =>
               item.isLast ? (
-                <Typography key={index} sx={{ color: "white" }}>
+                <Typography key={index} sx={{ color: "#1F283E" }}>
                   {item.label}
                 </Typography>
               ) : (
                 <Link
                   key={index}
                   underline="hover"
-                  sx={{ color: "#d1c4e9" }}
+                  sx={{ color: "#a5bae5" }}
                   href={item.href}
                 >
                   {item.label}
                 </Link>
               )
             )}
-          </Breadcrumbs> 
+          </Breadcrumbs>
         </Box>
         <Card
           sx={{
@@ -144,7 +148,7 @@ function AddLead() {
                     onChange={handleChange}
                     fullWidth
                     margin="normal"
-                   required
+                    required
                   />
                 </Grid>
 
@@ -184,7 +188,15 @@ function AddLead() {
                     width: "100%",
                   }}
                 >
-                  <Button type="submit" variant="contained">
+                  <Button
+                    type="submit"
+                    sx={{
+                      backgroundColor: "#a5bae5",
+                      color: "#1f283e",
+                      paddingInline: 2,
+                      paddingBlock: 1,
+                    }}
+                  >
                     Add Lead
                   </Button>
                 </Box>

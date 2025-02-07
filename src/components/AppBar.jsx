@@ -35,7 +35,11 @@ export default function AppBarComponent({
   const { user } = useAuth();
 
   return (
-    <AppBar position="fixed" open={open}>
+    <AppBar
+      position="fixed"
+      open={open}
+      sx={{ backgroundColor: "#a5bae5", color: "#fff" }}
+    >
       <Toolbar>
         <IconButton
           color="inherit"

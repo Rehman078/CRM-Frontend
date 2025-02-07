@@ -47,6 +47,17 @@ function EditContact() {
     navigate("/");
   };
 
+  // Handle form submission for contact update
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await updateContact(id, formData);
+      toast.success("Contact updated successfully!");
+    } catch (error) {
+      console.error("Error updating contact", error);
+    }
+  };
+
   //get contact data by id
   useEffect(() => {
     const fetchContactsData = async () => {
@@ -67,22 +78,11 @@ function EditContact() {
     fetchContactsData();
   }, [id]);
 
-  // Handle form submission for contact update
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await updateContact(id, formData);
-      toast.success("Contact updated successfully!");
-    } catch (error) {
-      console.error("Error updating contact", error);
-    }
-  };
-
-     // Breadcrumb name
-     const breadcrumbItems = [
-      { label: "Dashboard", Link: "/", href: "" },
-      { label: "Edit Lead", href: "", isLast: true },
-    ];
+  // Breadcrumb name
+  const breadcrumbItems = [
+    { label: "Dashboard", Link: "/", href: "" },
+    { label: "Edit Lead", href: "", isLast: true },
+  ];
   return (
     <Box sx={{ display: "flex" }}>
       <AppBarComponent
@@ -102,7 +102,7 @@ function EditContact() {
           transition: "margin 0.3s ease",
         }}
       >
-            <Box
+        <Box
           sx={{
             marginTop: 8,
           }}
@@ -110,14 +110,14 @@ function EditContact() {
           <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
             {breadcrumbItems.map((item, index) =>
               item.isLast ? (
-                <Typography key={index} sx={{ color: "white" }}>
+                <Typography key={index} sx={{ color: "#1F283E" }}>
                   {item.label}
                 </Typography>
               ) : (
                 <Link
                   key={index}
                   underline="hover"
-                  sx={{ color: "#d1c4e9" }}
+                  sx={{ color: "#a5bae5" }}
                   href={item.href}
                 >
                   {item.label}
@@ -240,8 +240,16 @@ function EditContact() {
                     width: "100%",
                   }}
                 >
-                  <Button type="submit" variant="contained">
-                    Save Changes
+                  <Button
+                    type="submit"
+                    sx={{
+                      backgroundColor: "#a5bae5",
+                      color: "#1f283e",
+                      paddingInline: 2,
+                      paddingBlock: 1,
+                    }}
+                  >
+                    Update Contact
                   </Button>
                 </Box>
               </Grid>
