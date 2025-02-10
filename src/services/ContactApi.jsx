@@ -6,7 +6,7 @@ export const getContacts = async () => {
   try {
     const config = getConfig();
     const response = await axios.get(`${API_BASE_URL}/contacts/`, config);
-    return response.data;
+    return response?.data;
   } catch (error) {
     throw new Error(
       error.response ? error.response.data.message : error.message
@@ -14,12 +14,12 @@ export const getContacts = async () => {
   }
 };
 
-export const addContacts = async (formData) => {
+export const addContacts = async (data) => {
   try {
     const config = getConfig();
     const response = await axios.post(
       `${API_BASE_URL}/contacts/`,
-      formData,
+      data,
       config
     );
     return response.data;

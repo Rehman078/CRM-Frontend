@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Toaster, toast } from "react-hot-toast";
+import {  useForm } from "react-hook-form";
 import {
   TextField,
   Button,
@@ -14,6 +15,7 @@ import {
   FormControl,
   Breadcrumbs,
   Link,
+  FormHelperText
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContaxt";
@@ -28,39 +30,29 @@ function AddLead() {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  // Form data state
-  const [formData, setFormData] = useState({
-    name: "",
-    contactinfo: "",
-    leadsource: "",
-    status: "New",
-  });
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      contactinfo: "",
+      leadsource: "",
+      status: "",
+    },
+  });
   // Logout function
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/login");
   };
 
-  // Handle form input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (
-      !formData.name ||
-      !formData.contactinfo ||
-      !formData.leadsource ||
-      !formData.status
-    ) {
-      toast.error("Name, Contact Info, Lead Source and Status are required.");
-      return;
-    }
+  const handleLead = async (data) => {
     try {
-      await addleads(formData);
+      console.log(data)
+      await addleads(data);
       toast.success("Lead added successfully.");
     } catch (error) {
       toast.error("Failed to add lead.");
@@ -126,57 +118,66 @@ function AddLead() {
               Add New Lead
             </Typography>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(handleLead)}>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Lead Name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
                     fullWidth
                     margin="normal"
-                    required
+                    {...register("name", { required: "Lead Name is required" })}
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Contact No."
-                    name="contactinfo"
-                    value={formData.contactinfo}
-                    onChange={handleChange}
                     fullWidth
                     margin="normal"
-                    required
+                    {...register("contactinfo", {
+                      required: "Contact No. is required",
+                    })}
+                    error={!!errors.contactinfo}
+                    helperText={errors.contactinfo?.message}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Lead Source"
-                    name="leadsource"
-                    value={formData.leadsource}
-                    onChange={handleChange}
                     fullWidth
                     margin="normal"
-                    required
+                    {...register("leadsource", {
+                      required: "Lead Source is required",
+                    })}
+                    error={!!errors.leadsource}
+                    helperText={errors.leadsource?.message}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth margin="normal">
+                  <FormControl
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.status}
+                  >
                     <InputLabel>Status</InputLabel>
                     <Select
-                      name="status"
-                      value={formData.status}
-                      onChange={handleChange}
+                      {...register("status", {
+                        required: "Status is required",
+                      })}
+                      defaultValue=""
                     >
                       <MenuItem value="New">New</MenuItem>
                       <MenuItem value="Contacted">Contacted</MenuItem>
                       <MenuItem value="Qualified">Qualified</MenuItem>
                       <MenuItem value="Lost">Lost</MenuItem>
                     </Select>
+                    {errors.status && (
+                      <FormHelperText sx={{color:"red"}}>{errors.status.message}</FormHelperText>
+                    )}
                   </FormControl>
                 </Grid>
 

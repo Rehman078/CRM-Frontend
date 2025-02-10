@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   TextField,
   Button,
@@ -9,30 +10,40 @@ import {
   InputLabel,
   FormControl,
   Chip,
-  Input,
   Card,
   CardContent,
   Grid,
   Breadcrumbs,
   Link,
+  FormHelperText
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContaxt";
 import AppBarComponent from "../../components/AppBar";
 import DrawerComponent from "../../components/SideBar";
-import { getContactsById, updateContact } from "../../services/ContactApi";
+import { getcontactsById, updateContact } from "../../services/ContactApi";
 import { Toaster, toast } from "react-hot-toast";
 
 function EditContact() {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    company: "",
-    tags: [],
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      company: "",
+      tags: [],
+    },
   });
+
   const { logout } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -44,14 +55,12 @@ function EditContact() {
   // Handle logout
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/login");
   };
 
-  // Handle form submission for contact update
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleContact = async (data) => {
     try {
-      await updateContact(id, formData);
+      await updateContact(id, data);
       toast.success("Contact updated successfully!");
     } catch (error) {
       console.error("Error updating contact", error);
@@ -60,23 +69,20 @@ function EditContact() {
 
   //get contact data by id
   useEffect(() => {
-    const fetchContactsData = async () => {
+    const fetchContactData = async () => {
       try {
-        const contacts = await getContactsById();
-
-        const contact = contacts.find((contact) => contact._id === id);
-        if (contact) {
-          setFormData(contact);
-        } else {
-          console.error("Contact not found for ID:", id);
-        }
+        const response = await getcontactsById(id); 
+          const contact = response.data[0];
+          Object.keys(contact).forEach((key) => setValue(key, contact[key]));
       } catch (error) {
-        console.error("Error fetching contacts:", error.message);
+        console.error("Error fetching contact:", error.message);
       }
     };
-
-    fetchContactsData();
-  }, [id]);
+  
+    fetchContactData();
+  }, [id, setValue]);
+  
+  
 
   // Breadcrumb name
   const breadcrumbItems = [
@@ -140,98 +146,117 @@ function EditContact() {
               Edit Contact
             </Typography>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(handleContact)}>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Name"
-                    name="name"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    fullWidth
+                     fullWidth
                     margin="normal"
+                    name="name"
+                    variant="outlined"
+                    {...register("name", { required: "Name is required" })}
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
+                   
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Email"
-                    name="email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value:
+                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                        message: "Invalid email format",
+                      },
+                    })}
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
                     fullWidth
                     margin="normal"
+                    variant="outlined"
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
+                    {...register("phone", { required: "Phone is required" })}
+                    error={!!errors.phone}
+                    helperText={errors.phone?.message}
                     fullWidth
                     margin="normal"
+                        variant="outlined"
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Address"
-                    name="address"
-                    value={formData.address}
-                    onChange={(e) =>
-                      setFormData({ ...formData, address: e.target.value })
-                    }
+                    {...register("address", {
+                      required: "Address is required",
+                    })}
+                    error={!!errors.address}
+                    helperText={errors.address?.message}
                     fullWidth
                     margin="normal"
+                       variant="outlined"
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Company"
-                    name="company"
-                    value={formData.company}
-                    onChange={(e) =>
-                      setFormData({ ...formData, company: e.target.value })
-                    }
+                    {...register("company", {
+                      required: "Company is required",
+                    })}
+                    error={!!errors.company}
+                    helperText={errors.company?.message}
                     fullWidth
                     margin="normal"
+                        variant="outlined"
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth margin="normal">
                     <InputLabel>Tags</InputLabel>
-                    <Select
-                      multiple
+                    <Controller
                       name="tags"
-                      value={formData.tags || []} // Ensure it's always an array
-                      onChange={(e) =>
-                        setFormData({ ...formData, tags: e.target.value })
-                      }
-                      input={<Input />}
-                      renderValue={(selected) => (
-                        <div>
-                          {selected.map((tag) => (
-                            <Chip key={tag} label={tag} sx={{ margin: 0.5 }} />
-                          ))}
-                        </div>
+                      control={control}
+                      rules={{ required: "At least one tag is required" }}
+                      render={({ field }) => (
+                        <Select
+                          multiple
+                          {...field}
+                          onChange={(e) => setValue("tags", e.target.value)}
+                          renderValue={(selected) => (
+                            <div>
+                              {selected.map((tag) => (
+                                <Chip
+                                  key={tag}
+                                  label={tag}
+                                  sx={{ margin: 0.5 }}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        >
+                          <MenuItem value="T1">T1</MenuItem>
+                          <MenuItem value="T2">T2</MenuItem>
+                          <MenuItem value="T3">T3</MenuItem>
+                        </Select>
                       )}
-                    >
-                      <MenuItem value="T1">T1</MenuItem>
-                      <MenuItem value="T2">T2</MenuItem>
-                      <MenuItem value="T3">T3</MenuItem>
-                    </Select>
+                    />
+                    {errors.tags && (
+                      <FormHelperText sx={{color:"red"}}>{errors.tags.message}</FormHelperText>
+                    )}
                   </FormControl>
                 </Grid>
+
                 <Box
                   sx={{
                     marginTop: 3,

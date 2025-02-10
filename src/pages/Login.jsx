@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import logo from "../assets/crm.png";
+import { useForm } from "react-hook-form";
 import {
   TextField,
   Button,
@@ -16,15 +17,17 @@ import { Toaster, toast } from "react-hot-toast";
 function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  // Login function
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  
+  const handleLogin = async (data) => {
     try {
-      const data = await loginUser({ email, password });
-      login(data.data);
+      const response = await loginUser(data);
+      login(response.data);
       navigate("/");
       toast.success("Successfully logged in!");
     } catch (err) {
@@ -55,7 +58,6 @@ function Login() {
           alignItems: "center",
         }}
       >
-        {/* Centered Logo */}
         <Box
           component="img"
           src={logo}
@@ -68,17 +70,22 @@ function Login() {
         <Typography variant="h4" align="center" gutterBottom>
           Login
         </Typography>
-        {/* Form */}
-        <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 2 }}>
+        <Box component="form" onSubmit={handleSubmit(handleLogin)} noValidate sx={{ mt: 2 }}>
           <TextField
             label="Email"
             type="email"
             fullWidth
             margin="normal"
             variant="outlined"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+            {...register("email", {
+              required: "Email is required",
+              pattern: {
+                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                message: "Invalid email format",
+              },
+            })}
+            error={!!errors.email}
+            helperText={errors.email?.message}
           />
           <TextField
             label="Password"
@@ -86,9 +93,12 @@ function Login() {
             fullWidth
             margin="normal"
             variant="outlined"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+            {...register("password", { 
+              required: "Password is required", 
+              minLength: { value: 6, message: "Password must be at least 6 characters long" },
+            })} 
+            error={!!errors.password} 
+            helperText={errors.password?.message} 
           />
           <Button
             type="submit"

@@ -59,7 +59,7 @@ function Contact() {
   //handle logout
   const handleLogout = () => {
     logout();
-    navigate("/"); // Redirect to login
+    navigate("/login"); // Redirect to login
   };
 
   //delete contact
@@ -232,7 +232,7 @@ function Contact() {
     filterType: "dropdown",
     responsive: "standard",
     selectableRows: "none",
-    rowsPerPage: 10,
+    rowsPerPage: 4,
     rowsPerPageOptions: [5, 10, 25, 50],
     search: true,
     download: false,

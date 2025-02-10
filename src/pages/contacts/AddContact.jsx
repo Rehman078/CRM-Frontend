@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { Controller, useForm } from "react-hook-form";
 import { Toaster, toast } from "react-hot-toast";
 import {
   TextField,
@@ -10,12 +11,12 @@ import {
   InputLabel,
   FormControl,
   Chip,
-  Input,
   Card,
   CardContent,
   Grid,
   Breadcrumbs,
   Link,
+  FormHelperText
 } from "@mui/material";
 import { addContacts } from "../../services/ContactApi";
 import { useNavigate } from "react-router-dom";
@@ -30,57 +31,44 @@ function AddContact() {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  // Form data state
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    company: "",
-    tags: [],
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      company: "",
+      tags: [],
+    },
   });
 
   //logout function
   const handleLogout = () => {
     logout();
-    navigate("/");
-  };
-
-  // Handle form input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "tags") {
-      setFormData({
-        ...formData,
-        tags: typeof value === "string" ? value.split(",") : value,
-      });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    navigate("/login");
   };
 
   // Handle contact form submit
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.name || !formData.email || !formData.phone) {
-      toast.error("Name, Email, and Phone are required.");
-      return;
-    }
-
+  const handleContact = async (data) => {
     try {
-      await addContacts(formData);
+       await addContacts(data);
       toast.success("Contact added successfully!");
     } catch (error) {
-      toast.error("Failed to add contact. Please try again.");
+      toast.error(error.response?.data?.message || "Failed to add contact. Please try again.");
     }
   };
-
+  
   // Breadcrumb name
   const breadcrumbItems = [
     { label: "Dashboard", Link: "/", href: "" },
     { label: "Add Contact", href: "", isLast: true },
   ];
+
   return (
     <Box sx={{ display: "flex" }}>
       <AppBarComponent
@@ -139,109 +127,141 @@ function AddContact() {
             <Typography variant="h5" gutterBottom align="center">
               Add New Contact
             </Typography>
-
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(handleContact)}>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    name="name"
+                     variant="outlined"
+                    {...register("name", { required: "Name is required" })}
+                    error={!!errors.name}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
                     fullWidth
                     margin="normal"
+                  name="email"
+                   variant="outlined"
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value:
+                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                        message: "Invalid email format",
+                      },
+                    })}
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    name="phone"
+                     variant="outlined"
+                    {...register("phone", { required: "Phone is required" })}
+                    error={!!errors.phone}
+                    helperText={errors.phone?.message}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    name="address"
+                     variant="outlined"
+                    {...register("address", {
+                      required: "Address is required",
+                    })}
+                    error={!!errors.address}
+                    helperText={errors.address?.message}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Company"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    name="company"
+                     variant="outlined"
+                    {...register("company", {
+                      required: "Company is required",
+                    })}
+                    error={!!errors.company}
+                    helperText={errors.company?.message}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                  {/* form */}
                   <FormControl fullWidth margin="normal">
                     <InputLabel>Tags</InputLabel>
-                    <Select
-                      multiple
+                    <Controller
                       name="tags"
-                      value={formData.tags}
-                      onChange={handleChange}
-                      input={<Input />}
-                      renderValue={(selected) => (
-                        <div>
-                          {selected.map((tag) => (
-                            <Chip key={tag} label={tag} sx={{ margin: 0.5 }} />
-                          ))}
-                        </div>
+                      control={control}
+                      rules={{ required: "One tag is required" }}
+                      render={({ field }) => (
+                        <Select
+                          multiple
+                          {...field}
+                          error={!!errors.tags}
+                          renderValue={(selected) => (
+                            <div>
+                              {selected.map((tag) => (
+                                <Chip
+                                  key={tag}
+                                  label={tag}
+                                  sx={{ margin: 0.5 }}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        >
+                          <MenuItem value="T1">T1</MenuItem>
+                          <MenuItem value="T2">T2</MenuItem>
+                          <MenuItem value="T3">T3</MenuItem>
+                        </Select>
                       )}
-                    >
-                      <MenuItem value="T1">T1</MenuItem>
-                      <MenuItem value="T2">T2</MenuItem>
-                      <MenuItem value="T3">T3</MenuItem>
-                      {/* Add more tags as needed */}
-                    </Select>
+                    />
+                    {errors.tags && (
+                      <FormHelperText sx={{color:"red"}}>{errors.tags.message}</FormHelperText>
+                    )}
                   </FormControl>
                 </Grid>
-                <Box
-                  sx={{
-                    marginTop: 3,
-                    display: "flex",
-                    justifyContent: "center",
-                    width: "100%",
-                  }}
-                >
-                  <Button
-                    type="submit"
+
+                <Grid item xs={12}>
+                  <Box
                     sx={{
-                      backgroundColor: "#a5bae5",
-                      color: "#1f283e",
-                      paddingInline: 2,
-                      paddingBlock: 1,
+                      display: "flex",
+                      justifyContent: "center",
+                      width: "100%",
+                      mt: 3,
                     }}
                   >
-                    Add Contact
-                  </Button>
-                </Box>
+                    <Button
+                      type="submit"
+                      sx={{
+                        backgroundColor: "#a5bae5",
+                        color: "#1f283e",
+                        paddingInline: 2,
+                        paddingBlock: 1,
+                      }}
+                    >
+                      Add Contact
+                    </Button>
+                  </Box>
+                </Grid>
               </Grid>
             </form>
           </CardContent>

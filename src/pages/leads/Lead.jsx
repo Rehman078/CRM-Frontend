@@ -44,7 +44,7 @@ function Lead() {
   // Logout function
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/login");
   };
 
   //assignmetn model
@@ -228,8 +228,8 @@ function Lead() {
     filterType: "dropdown",
     responsive: "standard",
     selectableRows: "none",
-    rowsPerPage: 10,
-    rowsPerPageOptions: [5, 10, 25, 50],
+    rowsPerPage: 4,
+    rowsPerPageOptions: [4, 10, 25, 50],
     search: true,
     download: false,
     print: false,
@@ -260,7 +260,7 @@ function Lead() {
 
         <Box
           sx={{
-            marginTop: 8,
+            marginTop: 7,
             marginBottom: 2,
             display: "flex",
             justifyContent: "space-between",

@@ -80,7 +80,7 @@ function SingleContact() {
   // Logout function
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/login");
   };
 
   // Handle note change

@@ -80,7 +80,7 @@ function SingleLead() {
   // Logout function
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/login");
   };
 
   // Handle note change

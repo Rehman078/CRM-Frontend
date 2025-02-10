@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
+import { useForm } from "react-hook-form";
 import {
   TextField,
   Button,
@@ -12,71 +13,64 @@ import {
   Select,
   InputLabel,
   FormControl,
+  FormHelperText,
   Breadcrumbs,
   Link,
 } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContaxt";
 import AppBarComponent from "../../components/AppBar";
 import DrawerComponent from "../../components/SideBar";
 import { getLeadsById, updateLead } from "../../services/LeadApi";
+
 function EditLead() {
   const [open, setOpen] = useState(false);
   const { logout } = useAuth();
-  const navigate = useNavigate();
   const { id } = useParams();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    contactinfo: "",
-    leadsource: "",
-    status: "New",
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      contactinfo: "",
+      leadsource: "",
+      status: "",
+    },
   });
 
-  // Handle input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
 
-    setFormData({ ...formData, [name]: value });
-  };
-
-  // Handle form submit
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (
-      !formData.name ||
-      !formData.contactinfo ||
-      !formData.leadsource ||
-      !formData.status ||
-      "New"
-    ) {
-      toast.error("All fields are required.");
-      return;
-    }
-    try {
-      await updateLead(id, formData);
-      toast.success("Lead updated successfully.");
-      navigate("/lead");
-    } catch (error) {
-      toast.error("Failed to update lead.");
-    }
-  };
+ // Watch status field to track changes
+  const selectedStatus = watch("status");
 
   useEffect(() => {
     const fetchLead = async () => {
       try {
         const response = await getLeadsById(id);
-        setFormData(response.data[0]);
+        const lead = response.data[0];
+        Object.keys(lead).forEach((key) => setValue(key, lead[key]));
       } catch (error) {
-        toast.error("Failed to fetch lead.");
+        console.error("Failed to fetch lead.");
       }
     };
     fetchLead();
-  }, [id]);
+  }, [id, setValue]);
 
-  // Breadcrumb name
+  const handleLead = async (data) => {
+    try {
+      await updateLead(id, data);
+      toast.success("Lead updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update lead.");
+    }
+  };
+
   const breadcrumbItems = [
-    { label: "Dashboard", Link: "/", href: "" },
+    { label: "Dashboard", href: "/" },
     { label: "Edit Lead", href: "", isLast: true },
   ];
 
@@ -131,53 +125,65 @@ function EditLead() {
             <Typography variant="h5" gutterBottom align="center">
               Update Lead
             </Typography>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(handleLead)}>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Lead Name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    {...register("name", { required: "Lead Name is required" })}
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Contact No."
-                    name="contactinfo"
-                    value={formData.contactinfo}
-                    onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    {...register("contactinfo", {
+                      required: "Contact No. is required",
+                    })}
+                    error={!!errors.contactinfo}
+                    helperText={errors.contactinfo?.message}
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Lead Source"
-                    name="leadsource"
-                    value={formData.leadsource}
-                    onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    {...register("leadsource", {
+                      required: "Lead Source is required",
+                    })}
+                    error={!!errors.leadsource}
+                    helperText={errors.leadsource?.message}
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth margin="normal">
+                  <FormControl fullWidth margin="normal" error={!!errors.status}>
                     <InputLabel>Status</InputLabel>
                     <Select
-                      name="status"
-                      value={formData.status}
-                      onChange={handleChange}
+                      value={selectedStatus || ""}
+                      {...register("status", { required: "Status is required" })}
+                      onChange={(e) => setValue("status", e.target.value)}
                     >
                       <MenuItem value="New">New</MenuItem>
                       <MenuItem value="Contacted">Contacted</MenuItem>
                       <MenuItem value="Qualified">Qualified</MenuItem>
                       <MenuItem value="Lost">Lost</MenuItem>
                     </Select>
+
+                    {errors.status && (
+                      <FormHelperText>{errors.status.message}</FormHelperText>
+                    )}
                   </FormControl>
                 </Grid>
+
                 <Box
                   sx={{
                     marginTop: 3,
