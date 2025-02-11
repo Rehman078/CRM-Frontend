@@ -12,12 +12,11 @@ export default function MiniDrawer() {
   const [userCount, setUserCount] = useState(0);
   const [contactCount, setContactCount] = useState(0);
   const [leadCount, setLeadCount] = useState(0);
-  const [open, setOpen] = useState(false);
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
-
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isAdminOrManager = user?.role === "Admin" || user?.role === "Manager";
 
   // Logout function
   const handleLogout = () => {
@@ -25,7 +24,7 @@ export default function MiniDrawer() {
     navigate("/login");
   };
 
-//fetch user count
+  //fetch user count
   const fetchUserCount = async () => {
     try {
       const users = await getUsers();
@@ -39,21 +38,23 @@ export default function MiniDrawer() {
   const fetchContactCount = async () => {
     try {
       const contacts = await getContacts();
-      setContactCount(contacts.data.length);t
+      setContactCount(contacts.data.length);
+      t;
     } catch (error) {
       console.error("Error fetching contact:", error);
     }
   };
 
-//fetch lead count
-const fetchLeadCount = async () => {
-  try {
-    const leads = await getLeads();
-    setLeadCount(leads.data.length);t
-  } catch (error) {
-    console.error("Error fetching lead:", error);
-  }
-};
+  //fetch lead count
+  const fetchLeadCount = async () => {
+    try {
+      const leads = await getLeads();
+      setLeadCount(leads.data.length);
+      t;
+    } catch (error) {
+      console.error("Error fetching lead:", error);
+    }
+  };
 
   useEffect(() => {
     fetchUserCount();
@@ -62,41 +63,43 @@ const fetchLeadCount = async () => {
   }, []);
 
   const cardData = [
-    { title: "User", count: ` ${userCount}`, content: `Manage CRM users.` },
-    { title: "Contact", count: `${contactCount}`,  content: "Manage your contacts." },
-    { title: "Lead", count: `${leadCount}`, content: "Track potential customers." },
-    { title: "Opportunity", count: "0", content: "Identify new business deals." },
+    ...(isAdminOrManager ? [{ title: "User", count: `${userCount}`, content: "Manage CRM users." }] : []),
+    {
+      title: "Contact",
+      count: `${contactCount}`,
+      content: "Manage your contacts.",
+    },
+    {
+      title: "Lead",
+      count: `${leadCount}`,
+      content: "Track potential customers.",
+    },
+    {
+      title: "Opportunity",
+      count: "0",
+      content: "Identify new business deals.",
+    },
   ];
-
-
+  
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <AppBarComponent
-        open={open}
-        handleDrawerOpen={handleDrawerOpen}
-        handleLogout={handleLogout}
-      />
-      <DrawerComponent open={open} handleDrawerClose={handleDrawerClose} />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          textAlign: "left",
-          marginLeft: open ? 30 : 9,
-          transition: "margin 0.3s ease",
-        }}
-      >
+    <Box sx={{ display: "flex", justifyContent: "center" }}>
+      <AppBarComponent handleLogout={handleLogout} />
+      <DrawerComponent />
+      <Box>
         <Grid
           container
-          spacing={5}
+          spacing={isAdminOrManager ? 5 : 10} 
           justifyContent="center"
           sx={{ marginTop: 6 }}
         >
           {cardData.map((card, index) => (
             <Grid item key={index}>
-              <CardComponent title={card.title} count={card.count} content={card.content} />
+              <CardComponent
+                title={card.title}
+                count={card.count}
+                content={card.content}
+              />
             </Grid>
           ))}
         </Grid>

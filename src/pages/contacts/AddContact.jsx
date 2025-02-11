@@ -16,7 +16,7 @@ import {
   Grid,
   Breadcrumbs,
   Link,
-  FormHelperText
+  FormHelperText,
 } from "@mui/material";
 import { addContacts } from "../../services/ContactApi";
 import { useNavigate } from "react-router-dom";
@@ -25,9 +25,6 @@ import AppBarComponent from "../../components/AppBar";
 import DrawerComponent from "../../components/SideBar";
 
 function AddContact() {
-  const [open, setOpen] = React.useState(false);
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -56,13 +53,16 @@ function AddContact() {
   // Handle contact form submit
   const handleContact = async (data) => {
     try {
-       await addContacts(data);
+      await addContacts(data);
       toast.success("Contact added successfully!");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to add contact. Please try again.");
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to add contact. Please try again."
+      );
     }
   };
-  
+
   // Breadcrumb name
   const breadcrumbItems = [
     { label: "Dashboard", Link: "/", href: "" },
@@ -70,49 +70,36 @@ function AddContact() {
   ];
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <AppBarComponent
-        open={open}
-        handleDrawerOpen={handleDrawerOpen}
-        handleLogout={handleLogout}
-      />
-      <DrawerComponent open={open} handleDrawerClose={handleDrawerClose} />
+    <Box>
+      <AppBarComponent handleLogout={handleLogout} />
+      <DrawerComponent />
       <Box
-        component="main"
         sx={{
-          flexGrow: 1,
-          p: 3,
-          textAlign: "left",
-          marginLeft: open ? 30 : 9,
-          transition: "margin 0.3s ease",
+          marginTop: 10,
+          marginLeft: 10,
         }}
       >
-        <Box
-          sx={{
-            marginTop: 8,
-          }}
-        >
-          {/* Breadcrum */}
-          <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
-            {breadcrumbItems.map((item, index) =>
-              item.isLast ? (
-                <Typography key={index} sx={{ color: "#1F283E" }}>
-                  {item.label}
-                </Typography>
-              ) : (
-                <Link
-                  key={index}
-                  underline="hover"
-                  sx={{ color: "#a5bae5" }}
-                  href={item.href}
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
-          </Breadcrumbs>
-        </Box>
-
+        {/* Breadcrum */}
+        <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
+          {breadcrumbItems.map((item, index) =>
+            item.isLast ? (
+              <Typography key={index} sx={{ color: "#1F283E" }}>
+                {item.label}
+              </Typography>
+            ) : (
+              <Link
+                key={index}
+                underline="hover"
+                sx={{ color: "#a5bae5" }}
+                href={item.href}
+              >
+                {item.label}
+              </Link>
+            )
+          )}
+        </Breadcrumbs>
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Toaster position="top-right" reverseOrder={false} />
         <Card
           sx={{
@@ -135,7 +122,7 @@ function AddContact() {
                     fullWidth
                     margin="normal"
                     name="name"
-                     variant="outlined"
+                    variant="outlined"
                     {...register("name", { required: "Name is required" })}
                     error={!!errors.name}
                   />
@@ -146,8 +133,8 @@ function AddContact() {
                     label="Email"
                     fullWidth
                     margin="normal"
-                  name="email"
-                   variant="outlined"
+                    name="email"
+                    variant="outlined"
                     {...register("email", {
                       required: "Email is required",
                       pattern: {
@@ -167,7 +154,7 @@ function AddContact() {
                     fullWidth
                     margin="normal"
                     name="phone"
-                     variant="outlined"
+                    variant="outlined"
                     {...register("phone", { required: "Phone is required" })}
                     error={!!errors.phone}
                     helperText={errors.phone?.message}
@@ -180,7 +167,7 @@ function AddContact() {
                     fullWidth
                     margin="normal"
                     name="address"
-                     variant="outlined"
+                    variant="outlined"
                     {...register("address", {
                       required: "Address is required",
                     })}
@@ -195,7 +182,7 @@ function AddContact() {
                     fullWidth
                     margin="normal"
                     name="company"
-                     variant="outlined"
+                    variant="outlined"
                     {...register("company", {
                       required: "Company is required",
                     })}
@@ -235,7 +222,9 @@ function AddContact() {
                       )}
                     />
                     {errors.tags && (
-                      <FormHelperText sx={{color:"red"}}>{errors.tags.message}</FormHelperText>
+                      <FormHelperText sx={{ color: "red" }}>
+                        {errors.tags.message}
+                      </FormHelperText>
                     )}
                   </FormControl>
                 </Grid>

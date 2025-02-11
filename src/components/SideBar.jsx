@@ -1,142 +1,105 @@
 import React from "react";
+import logo from "../assets/crm.png";
 import { Link } from "react-router-dom";
-import { Typography } from "@mui/material";
-import { styled, useTheme } from "@mui/material/styles";
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import Person from '@mui/icons-material/Person';
-import TrendingUp from '@mui/icons-material/TrendingUp';
+import { styled } from "@mui/material/styles";
 import MuiDrawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { Box, Typography } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import PersonIcon from "@mui/icons-material/Person";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
-const drawerWidth = 240;
-const closedWidth = 70;
+const drawerWidth = 73;
 
-const openedMixin = (theme) => ({
+const Drawer = styled(MuiDrawer)({
   width: drawerWidth,
-  transition: theme.transitions.create("width", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  }),
-  overflowX: "hidden",
-});
-
-const closedMixin = (theme) => ({
-  width: closedWidth,
-  transition: theme.transitions.create("width", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  overflowX: "hidden",
-  [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
-  },
-});
-
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-}));
-
-const Drawer = styled(MuiDrawer)(({ theme, open }) => ({
-  maxidth: drawerWidth,
   flexShrink: 0,
-  whiteSpace: "nowrap",
-  boxSizing: "border-box",
   "& .MuiDrawer-paper": {
+    width: drawerWidth,
     backgroundColor: "#f0efef",
-    ...(open ? openedMixin(theme) : closedMixin(theme)),
   },
-}));
+});
 
-export default function DrawerComponent({ open, handleDrawerClose }) {
-  const theme = useTheme();
-
+export default function DrawerComponent() {
   return (
-    <Drawer variant="permanent" open={open}>
-      <DrawerHeader>
-        <IconButton onClick={handleDrawerClose}>
-          {theme.direction === "rtl" ? (
-            <ChevronRightIcon style={{ color: "#1f283e" }} />
-          ) : (
-            <ChevronLeftIcon style={{ color: "#1f283e" }} />
-          )}
-        </IconButton>
-      </DrawerHeader>
+    <Drawer variant="permanent">
+      <Box
+        component="img"
+        src={logo}
+        alt="logo"
+        sx={{
+          width: "90px",
+          height: "75px",
+        }}
+      />
       <Divider />
-      <Link to={"/"}>
-        <List>
-          <ListItem disablePadding sx={{ display: "block" }}>
-            <ListItemButton sx={{ minHeight: 48, px: 2.5 }}>
-              <ListItemIcon
-                sx={{ minWidth: 0, justifyContent: "center", color: "white" }}
-              >
+      <List>
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <ListItem disablePadding sx={{ paddingInline: 2 }}>
+            <ListItemButton sx={{ flexDirection: "column" }}>
+              <ListItemIcon sx={{ minWidth: "auto" }}>
                 <DashboardIcon sx={{ color: "#1f283e", fontSize: 30 }} />
               </ListItemIcon>
               <ListItemText
-                primary="Dashboard"
-                sx={{
-                  paddingLeft: open ? 2 : 4,
-                  color: "#1f283e",
-                }}
+                primary={
+                  <Typography
+                    variant="body2"
+                    sx={{ fontSize: "12px", color: "#1f283e", textAlign: "center" }}
+                  >
+                    Dashboard
+                  </Typography>
+                }
               />
             </ListItemButton>
           </ListItem>
-        </List>
-      </Link>
-      <Divider />
-      <Link to={"/contacts"}>
-        <List>
-          <ListItem disablePadding sx={{ display: "block" }}>
-            <ListItemButton sx={{ minHeight: 48, px: 2.5 }}>
-              <ListItemIcon
-                sx={{ minWidth: 0, justifyContent: "center", color: "white" }}
-              >
-                <Person sx={{ color: "#1f283e", fontSize: 30 }} />
+        </Link>
+        <Divider />
+        <Link to="/contacts" style={{ textDecoration: "none" }}>
+          <ListItem disablePadding>
+            <ListItemButton sx={{ flexDirection: "column" }}>
+              <ListItemIcon sx={{ minWidth: "auto" }}>
+                <PersonIcon sx={{ color: "#1f283e", fontSize: 30 }} />
               </ListItemIcon>
               <ListItemText
-                primary="Contact"
-                sx={{
-                  paddingLeft: open ? 2 : 4,
-                  color: "#1f283e",
-                }}
+                primary={
+                  <Typography
+                    variant="body2"
+                    sx={{ fontSize: "12px", color: "#1f283e", textAlign: "center" }}
+                  >
+                    Contacts
+                  </Typography>
+                }
               />
             </ListItemButton>
           </ListItem>
-        </List>
-      </Link>
-      <Divider />
-      <Link to={"/lead"}>
-        <List>
-          <ListItem disablePadding sx={{ display: "block" }}>
-            <ListItemButton sx={{ minHeight: 48, px: 2.5 }}>
-              <ListItemIcon
-                sx={{ minWidth: 0, justifyContent: "center", color: "white" }}
-              >
-                <TrendingUp sx={{ color: "#1f283e", fontSize: 30 }} />
+        </Link>
+        <Divider />
+        <Link to="/lead" style={{ textDecoration: "none" }}>
+          <ListItem disablePadding>
+            <ListItemButton sx={{ flexDirection: "column" }}>
+              <ListItemIcon sx={{ minWidth: "auto" }}>
+                <TrendingUpIcon sx={{ color: "#1f283e", fontSize: 30 }} />
               </ListItemIcon>
               <ListItemText
-                primary="Lead"
-                sx={{
-                  paddingLeft: open ? 2 : 4,
-                  color: "#1f283e",
-                }}
+                primary={
+                  <Typography
+                    variant="body2"
+                    sx={{ fontSize: "12px", color: "#1f283e", textAlign: "center" }}
+                  >
+                    Leads
+                  </Typography>
+                }
               />
             </ListItemButton>
           </ListItem>
-        </List>
-      </Link>
-      <Divider />
+        </Link>
+        <Divider />
+      </List>
     </Drawer>
   );
 }

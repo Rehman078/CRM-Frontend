@@ -27,9 +27,6 @@ import { getLeads, deleteLead, assignLead } from "../../services/LeadApi";
 
 function Lead() {
   const [leads, setLeads] = React.useState([]);
-  const [open, setOpen] = React.useState(false);
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
   const [openModel, setOpenModel] = useState(false);
   const [currentLeadId, setCurrentLeadId] = useState(null);
   const [users, setUsers] = useState([]);
@@ -239,35 +236,22 @@ function Lead() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <AppBarComponent
-        open={open}
-        handleDrawerOpen={handleDrawerOpen}
-        handleLogout={handleLogout}
-      />
-      <DrawerComponent open={open} handleDrawerClose={handleDrawerClose} />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          textAlign: "left",
-          marginLeft: open ? 30 : 9,
-          transition: "margin 0.3s ease",
-        }}
-      >
+    <Box sx={{ width: "90%", marginLeft: 9, marginTop: 9 }}>
+      <AppBarComponent handleLogout={handleLogout} />
+      <DrawerComponent />
+      <Box>
         <Toaster position="top-right" reverseOrder={false} />
 
-        <Box
-          sx={{
-            marginTop: 7,
-            marginBottom: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          <Breadcrumbs aria-label="breadcrumb">
+        <Box>
+          {/* BreadCrum */}
+          <Breadcrumbs
+            aria-label="breadcrumb"
+            sx={{
+              color: "#d1c4e9",
+              paddingBottom: 1,
+              paddingLeft: 2,
+            }}
+          >
             {breadcrumbItems.map((item, index) =>
               item.isLast ? (
                 <Typography key={index} sx={{ color: "#1F283E" }}>
@@ -286,28 +270,30 @@ function Lead() {
             )}
           </Breadcrumbs>
 
-          <Link to="/addlead">
-            <Button
-              sx={{
-                backgroundColor: "#a5bae5",
-                color: "#1f283e",
-                paddingInline: 2,
-                paddingBlock: 1,
-              }}
-            >
-              Add Lead
-            </Button>
-          </Link>
+          <Box sx={{ display: "flex", justifyContent: "end" }}>
+            <Link to="/addlead">
+              <Button
+                sx={{
+                  backgroundColor: "#a5bae5",
+                  color: "#1f283e",
+                  paddingInline: 2,
+                }}
+              >
+                Add Lead
+              </Button>
+            </Link>
+          </Box>
         </Box>
 
         {/* Table Container */}
-
-        <MUIDataTable
-          title="Lead List"
-          data={leads}
-          columns={columns}
-          options={options}
-        />
+        <Box sx={{ marginLeft: 10, marginTop: 3 }}>
+          <MUIDataTable
+            title="Lead List"
+            data={leads}
+            columns={columns}
+            options={options}
+          />
+        </Box>
 
         {/* Assignment Modal */}
         <Modal

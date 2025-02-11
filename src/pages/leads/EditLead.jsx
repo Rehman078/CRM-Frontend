@@ -43,8 +43,7 @@ function EditLead() {
     },
   });
 
-
- // Watch status field to track changes
+  // Watch status field to track changes
   const selectedStatus = watch("status");
 
   useEffect(() => {
@@ -75,52 +74,38 @@ function EditLead() {
   ];
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <AppBarComponent
-        open={open}
-        handleDrawerOpen={() => setOpen(true)}
-        handleLogout={logout}
-      />
-      <DrawerComponent open={open} handleDrawerClose={() => setOpen(false)} />
+    <Box>
+      <AppBarComponent handleLogout={logout} />
+      <DrawerComponent />
+      <Toaster position="top-right" reverseOrder={false} />
       <Box
-        component="main"
         sx={{
-          flexGrow: 1,
-          p: 3,
-          textAlign: "left",
-          marginLeft: open ? 30 : 9,
-          transition: "margin 0.3s ease",
+          marginTop: 10,
+          marginLeft: 10,
         }}
       >
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
-            {breadcrumbItems.map((item, index) =>
-              item.isLast ? (
-                <Typography key={index} sx={{ color: "#1F283E" }}>
-                  {item.label}
-                </Typography>
-              ) : (
-                <Link
-                  key={index}
-                  underline="hover"
-                  sx={{ color: "#a5bae5" }}
-                  href={item.href}
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
-          </Breadcrumbs>
-        </Box>
-        <Toaster position="top-right" reverseOrder={false} />
-        <Card sx={{ margin: "auto", marginTop: 8, maxWidth: 900, padding: 3 }}>
+        {/* Breadcrum */}
+        <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
+          {breadcrumbItems.map((item, index) =>
+            item.isLast ? (
+              <Typography key={index} sx={{ color: "#1F283E" }}>
+                {item.label}
+              </Typography>
+            ) : (
+              <Link
+                key={index}
+                underline="hover"
+                sx={{ color: "#a5bae5" }}
+                href={item.href}
+              >
+                {item.label}
+              </Link>
+            )
+          )}
+        </Breadcrumbs>
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Card sx={{ marginTop: 8, maxWidth: 900, padding: 3 }}>
           <CardContent>
             <Typography variant="h5" gutterBottom align="center">
               Update Lead
@@ -165,11 +150,17 @@ function EditLead() {
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth margin="normal" error={!!errors.status}>
+                  <FormControl
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.status}
+                  >
                     <InputLabel>Status</InputLabel>
                     <Select
                       value={selectedStatus || ""}
-                      {...register("status", { required: "Status is required" })}
+                      {...register("status", {
+                        required: "Status is required",
+                      })}
                       onChange={(e) => setValue("status", e.target.value)}
                     >
                       <MenuItem value="New">New</MenuItem>

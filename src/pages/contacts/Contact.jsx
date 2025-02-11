@@ -29,10 +29,8 @@ import {
 import { getUsers } from "../../services/AuthApi";
 
 function Contact() {
-  const [open, setOpen] = useState(false);
   const [contacts, setContacts] = useState([]);
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [assignedUsers, setAssignedUsers] = useState([]);
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -42,9 +40,6 @@ function Contact() {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdminOrManager = user?.role === "Admin" || user?.role === "Manager";
-
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
 
   //assignment modal open
   const handleOpen = (contactId) => {
@@ -248,36 +243,20 @@ function Contact() {
   ];
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <AppBarComponent
-        open={open}
-        handleDrawerOpen={handleDrawerOpen}
-        handleLogout={handleLogout}
-      />
-      <DrawerComponent open={open} handleDrawerClose={handleDrawerClose} />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          textAlign: "left",
-          marginLeft: open ? 30 : 9,
-          transition: "margin 0.3s ease",
-        }}
-      >
+    <>
+      <Box sx={{ width: "90%", marginLeft: 9, marginTop: 9 }}>
+        <AppBarComponent handleLogout={handleLogout} />
+        <DrawerComponent />
         <Toaster position="top-right" reverseOrder={false} />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
+        <Box>
           {/* BreadCrum */}
           <Breadcrumbs
             aria-label="breadcrumb"
-            sx={{ color: "#d1c4e9", paddingBottom: 4 }}
+            sx={{
+              color: "#d1c4e9",
+              paddingBottom: 1,
+              paddingLeft: 2,
+            }}
           >
             {breadcrumbItems.map((item, index) =>
               item.isLast ? (
@@ -297,27 +276,30 @@ function Contact() {
             )}
           </Breadcrumbs>
 
-          <Link to="/addcontact">
-            <Button
-              sx={{
-                backgroundColor: "#a5bae5",
-                color: "#1f283e",
-                paddingInline: 2,
-                paddingBlock: 1,
-              }}
-            >
-              Add Contact
-            </Button>
-          </Link>
+          <Box sx={{ display: "flex", justifyContent: "end" }}>
+            <Link to="/addcontact">
+              <Button
+                sx={{
+                  backgroundColor: "#a5bae5",
+                  color: "#1f283e",
+                  paddingInline: 2,
+                }}
+              >
+                Add Contact
+              </Button>
+            </Link>
+          </Box>
         </Box>
 
         {/* Contacts Table */}
-        <MUIDataTable
-          title="Contacts List"
-          data={contacts}
-          columns={columns}
-          options={options}
-        />
+        <Box sx={{ marginLeft: 10, marginTop: 2 }}>
+          <MUIDataTable
+            title="Contacts List"
+            data={contacts}
+            columns={columns}
+            options={options}
+          />
+        </Box>
 
         {/* Assignment Modal */}
         <Modal
@@ -388,7 +370,7 @@ function Contact() {
           </Box>
         </Modal>
       </Box>
-    </Box>
+    </>
   );
 }
 

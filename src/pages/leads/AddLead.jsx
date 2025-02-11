@@ -1,6 +1,6 @@
 import React from "react";
 import { Toaster, toast } from "react-hot-toast";
-import {  useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   TextField,
   Button,
@@ -15,7 +15,7 @@ import {
   FormControl,
   Breadcrumbs,
   Link,
-  FormHelperText
+  FormHelperText,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContaxt";
@@ -24,12 +24,8 @@ import DrawerComponent from "../../components/SideBar";
 import { addleads } from "../../services/LeadApi";
 
 function AddLead() {
-  const [open, setOpen] = React.useState(false);
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
-
 
   const {
     register,
@@ -51,7 +47,7 @@ function AddLead() {
 
   const handleLead = async (data) => {
     try {
-      console.log(data)
+      console.log(data);
       await addleads(data);
       toast.success("Lead added successfully.");
     } catch (error) {
@@ -66,44 +62,31 @@ function AddLead() {
   ];
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <AppBarComponent
-        open={open}
-        handleDrawerOpen={handleDrawerOpen}
-        handleLogout={handleLogout}
-      />
-      <DrawerComponent open={open} handleDrawerClose={handleDrawerClose} />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          textAlign: "left",
-          marginLeft: open ? 30 : 9,
-          transition: "margin 0.3s ease",
-        }}
-      >
-        <Toaster position="top-right" reverseOrder={false} />
-        <Box sx={{ paddingTop: 8 }}>
-          <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
-            {breadcrumbItems.map((item, index) =>
-              item.isLast ? (
-                <Typography key={index} sx={{ color: "#1F283E" }}>
-                  {item.label}
-                </Typography>
-              ) : (
-                <Link
-                  key={index}
-                  underline="hover"
-                  sx={{ color: "#a5bae5" }}
-                  href={item.href}
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
-          </Breadcrumbs>
-        </Box>
+    <Box>
+      <AppBarComponent handleLogout={handleLogout} />
+      <DrawerComponent />
+      <Toaster position="top-right" reverseOrder={false} />
+      <Box sx={{ marginTop:10, marginLeft:10 }}>
+        <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
+          {breadcrumbItems.map((item, index) =>
+            item.isLast ? (
+              <Typography key={index} sx={{ color: "#1F283E" }}>
+                {item.label}
+              </Typography>
+            ) : (
+              <Link
+                key={index}
+                underline="hover"
+                sx={{ color: "#a5bae5" }}
+                href={item.href}
+              >
+                {item.label}
+              </Link>
+            )
+          )}
+        </Breadcrumbs>
+      </Box>
+      <Box x={{ display: "flex", justifyContent: "center" }}>
         <Card
           sx={{
             margin: "auto",
@@ -176,7 +159,9 @@ function AddLead() {
                       <MenuItem value="Lost">Lost</MenuItem>
                     </Select>
                     {errors.status && (
-                      <FormHelperText sx={{color:"red"}}>{errors.status.message}</FormHelperText>
+                      <FormHelperText sx={{ color: "red" }}>
+                        {errors.status.message}
+                      </FormHelperText>
                     )}
                   </FormControl>
                 </Grid>

@@ -15,7 +15,7 @@ import {
   Grid,
   Breadcrumbs,
   Link,
-  FormHelperText
+  FormHelperText,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContaxt";
@@ -25,7 +25,6 @@ import { getcontactsById, updateContact } from "../../services/ContactApi";
 import { Toaster, toast } from "react-hot-toast";
 
 function EditContact() {
-  const [open, setOpen] = useState(false);
 
   const {
     register,
@@ -48,10 +47,6 @@ function EditContact() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // Handle drawer opening and closing
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
-
   // Handle logout
   const handleLogout = () => {
     logout();
@@ -71,18 +66,16 @@ function EditContact() {
   useEffect(() => {
     const fetchContactData = async () => {
       try {
-        const response = await getcontactsById(id); 
-          const contact = response.data[0];
-          Object.keys(contact).forEach((key) => setValue(key, contact[key]));
+        const response = await getcontactsById(id);
+        const contact = response.data[0];
+        Object.keys(contact).forEach((key) => setValue(key, contact[key]));
       } catch (error) {
         console.error("Error fetching contact:", error.message);
       }
     };
-  
+
     fetchContactData();
   }, [id, setValue]);
-  
-  
 
   // Breadcrumb name
   const breadcrumbItems = [
@@ -90,27 +83,16 @@ function EditContact() {
     { label: "Edit Lead", href: "", isLast: true },
   ];
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box>
       <AppBarComponent
-        open={open}
-        handleDrawerOpen={handleDrawerOpen}
         handleLogout={handleLogout}
       />
-      <DrawerComponent open={open} handleDrawerClose={handleDrawerClose} />
+      <DrawerComponent />
       <Toaster position="top-right" reverseOrder={false} />
       <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          textAlign: "left",
-          marginLeft: open ? 30 : 9,
-          transition: "margin 0.3s ease",
-        }}
-      >
-        <Box
           sx={{
-            marginTop: 8,
+            marginTop: 10,
+            marginLeft:10
           }}
         >
           <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
@@ -132,6 +114,7 @@ function EditContact() {
             )}
           </Breadcrumbs>
         </Box>
+      <Box sx={{ display: "flex", justifyContent:"center" }}>
         <Card
           sx={{
             margin: "auto",
@@ -151,14 +134,13 @@ function EditContact() {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Name"
-                     fullWidth
+                    fullWidth
                     margin="normal"
                     name="name"
                     variant="outlined"
                     {...register("name", { required: "Name is required" })}
                     error={!!errors.name}
                     helperText={errors.name?.message}
-                   
                   />
                 </Grid>
 
@@ -189,7 +171,7 @@ function EditContact() {
                     helperText={errors.phone?.message}
                     fullWidth
                     margin="normal"
-                        variant="outlined"
+                    variant="outlined"
                   />
                 </Grid>
 
@@ -203,7 +185,7 @@ function EditContact() {
                     helperText={errors.address?.message}
                     fullWidth
                     margin="normal"
-                       variant="outlined"
+                    variant="outlined"
                   />
                 </Grid>
 
@@ -217,7 +199,7 @@ function EditContact() {
                     helperText={errors.company?.message}
                     fullWidth
                     margin="normal"
-                        variant="outlined"
+                    variant="outlined"
                   />
                 </Grid>
 
@@ -252,7 +234,9 @@ function EditContact() {
                       )}
                     />
                     {errors.tags && (
-                      <FormHelperText sx={{color:"red"}}>{errors.tags.message}</FormHelperText>
+                      <FormHelperText sx={{ color: "red" }}>
+                        {errors.tags.message}
+                      </FormHelperText>
                     )}
                   </FormControl>
                 </Grid>

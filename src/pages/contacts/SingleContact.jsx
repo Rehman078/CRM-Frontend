@@ -24,6 +24,8 @@ import {
   Tooltip,
   CircularProgress,
   Alert,
+  Breadcrumbs,
+  Link
 } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Toaster, toast } from "react-hot-toast";
@@ -43,9 +45,6 @@ function SingleContact() {
   const user = JSON.parse(localStorage.getItem("user"));
 
   //for dashboard
-  const [open, setOpen] = useState(false);
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
   const { logout } = useAuth();
 
   //for navigation
@@ -244,34 +243,53 @@ function SingleContact() {
     uploaded_by_role: file.uploaded_by.role,
     createdAt: new Date(file.createdAt).toLocaleDateString(),
   }));
-
+  // Breadcrumb name
+  const breadcrumbItems = [
+    { label: "Dashboard", Link: "/", href: "" },
+    { label: "Single Lead", href: "", isLast: true },
+  ];
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box>
       <AppBarComponent
-        open={open}
-        handleDrawerOpen={handleDrawerOpen}
         handleLogout={handleLogout}
       />
-      <DrawerComponent open={open} handleDrawerClose={handleDrawerClose} />
+      <DrawerComponent  />
       <Toaster position="top-right" reverseOrder={false} />
       <Box
-        component="main"
         sx={{
-          flexGrow: 1,
-          p: 3,
-          textAlign: "left",
-          marginLeft: open ? 30 : 9,
-          transition: "margin 0.3s ease",
-          marginTop: 8,
+          marginTop: 10,
+          marginLeft: 10,
         }}
       >
+        {/* Breadcrum */}
+        <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
+          {breadcrumbItems.map((item, index) =>
+            item.isLast ? (
+              <Typography key={index} sx={{ color: "#1F283E" }}>
+                {item.label}
+              </Typography>
+            ) : (
+              <Link
+                key={index}
+                underline="hover"
+                sx={{ color: "#a5bae5" }}
+                href={item.href}
+              >
+                {item.label}
+              </Link>
+            )
+          )}
+        </Breadcrumbs>
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "center", mt:2, ml:6 }}>
         <Paper
           elevation={5}
           sx={{
             p: 3,
             backgroundColor: "white",
             borderRadius: 2,
-            minHeight: "83vh",
+            minHeight: "78vh",
+            width: "85%",
             paddingTop: 6,
             paddingInline: 8,
           }}
