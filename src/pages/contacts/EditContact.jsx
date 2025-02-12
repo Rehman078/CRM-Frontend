@@ -25,7 +25,6 @@ import { getcontactsById, updateContact } from "../../services/ContactApi";
 import { Toaster, toast } from "react-hot-toast";
 
 function EditContact() {
-
   const {
     register,
     handleSubmit,
@@ -84,37 +83,35 @@ function EditContact() {
   ];
   return (
     <Box>
-      <AppBarComponent
-        handleLogout={handleLogout}
-      />
+      <AppBarComponent handleLogout={handleLogout} />
       <DrawerComponent />
       <Toaster position="top-right" reverseOrder={false} />
       <Box
-          sx={{
-            marginTop: 10,
-            marginLeft:10
-          }}
-        >
-          <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
-            {breadcrumbItems.map((item, index) =>
-              item.isLast ? (
-                <Typography key={index} sx={{ color: "#1F283E" }}>
-                  {item.label}
-                </Typography>
-              ) : (
-                <Link
-                  key={index}
-                  underline="hover"
-                  sx={{ color: "#a5bae5" }}
-                  href={item.href}
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
-          </Breadcrumbs>
-        </Box>
-      <Box sx={{ display: "flex", justifyContent:"center" }}>
+        sx={{
+          marginTop: 10,
+          marginLeft: 10,
+        }}
+      >
+        <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
+          {breadcrumbItems.map((item, index) =>
+            item.isLast ? (
+              <Typography key={index} sx={{ color: "#1F283E" }}>
+                {item.label}
+              </Typography>
+            ) : (
+              <Link
+                key={index}
+                underline="hover"
+                sx={{ color: "#a5bae5" }}
+                href={item.href}
+              >
+                {item.label}
+              </Link>
+            )
+          )}
+        </Breadcrumbs>
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Card
           sx={{
             margin: "auto",

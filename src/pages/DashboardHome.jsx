@@ -63,7 +63,9 @@ export default function MiniDrawer() {
   }, []);
 
   const cardData = [
-    ...(isAdminOrManager ? [{ title: "User", count: `${userCount}`, content: "Manage CRM users." }] : []),
+    ...(isAdminOrManager
+      ? [{ title: "User", count: `${userCount}`, content: "Manage CRM users." }]
+      : []),
     {
       title: "Contact",
       count: `${contactCount}`,
@@ -80,7 +82,6 @@ export default function MiniDrawer() {
       content: "Identify new business deals.",
     },
   ];
-  
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -89,7 +90,7 @@ export default function MiniDrawer() {
       <Box>
         <Grid
           container
-          spacing={isAdminOrManager ? 5 : 10} 
+          spacing={isAdminOrManager ? 5 : 10}
           justifyContent="center"
           sx={{ marginTop: 6 }}
         >

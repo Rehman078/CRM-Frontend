@@ -17,13 +17,13 @@ import { Toaster, toast } from "react-hot-toast";
 function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  
+
   const handleLogin = async (data) => {
     try {
       const response = await loginUser(data);
@@ -70,7 +70,12 @@ function Login() {
         <Typography variant="h4" align="center" gutterBottom>
           Login
         </Typography>
-        <Box component="form" onSubmit={handleSubmit(handleLogin)} noValidate sx={{ mt: 2 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(handleLogin)}
+          noValidate
+          sx={{ mt: 2 }}
+        >
           <TextField
             label="Email"
             type="email"
@@ -93,12 +98,15 @@ function Login() {
             fullWidth
             margin="normal"
             variant="outlined"
-            {...register("password", { 
-              required: "Password is required", 
-              minLength: { value: 6, message: "Password must be at least 6 characters long" },
-            })} 
-            error={!!errors.password} 
-            helperText={errors.password?.message} 
+            {...register("password", {
+              required: "Password is required",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters long",
+              },
+            })}
+            error={!!errors.password}
+            helperText={errors.password?.message}
           />
           <Button
             type="submit"

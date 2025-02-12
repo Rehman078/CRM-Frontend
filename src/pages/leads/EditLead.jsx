@@ -24,7 +24,6 @@ import DrawerComponent from "../../components/SideBar";
 import { getLeadsById, updateLead } from "../../services/LeadApi";
 
 function EditLead() {
-  const [open, setOpen] = useState(false);
   const { logout } = useAuth();
   const { id } = useParams();
 

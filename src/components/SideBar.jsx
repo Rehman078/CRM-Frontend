@@ -28,19 +28,21 @@ const Drawer = styled(MuiDrawer)({
 export default function DrawerComponent() {
   return (
     <Drawer variant="permanent">
-      <Box
+     <Link to="/">
+     <Box
         component="img"
         src={logo}
         alt="logo"
         sx={{
           width: "90px",
-          height: "75px",
+          height: "70px",
         }}
       />
+     </Link>
       <Divider />
       <List>
         <Link to="/" style={{ textDecoration: "none" }}>
-          <ListItem disablePadding sx={{ paddingInline: 2 }}>
+          <ListItem disablePadding>
             <ListItemButton sx={{ flexDirection: "column" }}>
               <ListItemIcon sx={{ minWidth: "auto" }}>
                 <DashboardIcon sx={{ color: "#1f283e", fontSize: 30 }} />
@@ -49,7 +51,11 @@ export default function DrawerComponent() {
                 primary={
                   <Typography
                     variant="body2"
-                    sx={{ fontSize: "12px", color: "#1f283e", textAlign: "center" }}
+                    sx={{
+                      fontSize: "12px",
+                      color: "#1f283e",
+                      textAlign: "center",
+                    }}
                   >
                     Dashboard
                   </Typography>
@@ -69,7 +75,11 @@ export default function DrawerComponent() {
                 primary={
                   <Typography
                     variant="body2"
-                    sx={{ fontSize: "12px", color: "#1f283e", textAlign: "center" }}
+                    sx={{
+                      fontSize: "12px",
+                      color: "#1f283e",
+                      textAlign: "center",
+                    }}
                   >
                     Contacts
                   </Typography>
@@ -89,7 +99,11 @@ export default function DrawerComponent() {
                 primary={
                   <Typography
                     variant="body2"
-                    sx={{ fontSize: "12px", color: "#1f283e", textAlign: "center" }}
+                    sx={{
+                      fontSize: "12px",
+                      color: "#1f283e",
+                      textAlign: "center",
+                    }}
                   >
                     Leads
                   </Typography>

@@ -25,7 +25,7 @@ import {
   CircularProgress,
   Alert,
   Breadcrumbs,
-  Link
+  Link,
 } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Toaster, toast } from "react-hot-toast";
@@ -34,7 +34,7 @@ import AppBarComponent from "../../components/AppBar";
 import DrawerComponent from "../../components/SideBar";
 import { useAuth } from "../../context/AuthContaxt";
 import { getLeadsById } from "../../services/LeadApi";
-import { addNote } from "../../services/NoteApi";
+import { addNote, getNotesByLeadId } from "../../services/NoteApi";
 import {
   addFiles,
   getFilesByLeadId,
@@ -50,6 +50,7 @@ function SingleLead() {
   const { id } = useParams();
 
   const [lead, setLead] = useState(null);
+  const [notes, setNotes] = useState([]);
 
   //tab value
   const [value, setValue] = useState("1");
@@ -97,10 +98,21 @@ function SingleLead() {
     }
     try {
       await addNote(note);
+      fetchNote();
       toast.success("Note added successfully.");
       setNote({ ...note, note: "" });
     } catch (error) {
       toast.error("Failed to add note.");
+    }
+  };
+
+  const fetchNote = async () => {
+    try {
+      const response = await getNotesByLeadId(id);
+      console.log(response.data);
+      setNotes(response.data);
+    } catch (error) {
+      console.error("Error fetching note:", error);
     }
   };
 
@@ -166,8 +178,9 @@ function SingleLead() {
         console.error("Error fetching lead:", error);
       }
     };
-    fetchFile();
     fetchLead();
+    fetchNote();
+    fetchFile();
   }, [id]);
 
   const columns = [
@@ -244,10 +257,8 @@ function SingleLead() {
     { label: "Single Lead", href: "", isLast: true },
   ];
   return (
-    <Box >
-      <AppBarComponent
-        handleLogout={handleLogout}
-      />
+    <Box>
+      <AppBarComponent handleLogout={handleLogout} />
       <DrawerComponent />
       <Toaster position="top-right" reverseOrder={false} />
       <Box
@@ -276,19 +287,19 @@ function SingleLead() {
           )}
         </Breadcrumbs>
       </Box>
-      <Box sx={{display:"flex", justifyContent:"center"}} >
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Paper
           elevation={5}
           sx={{
             p: 3,
             backgroundColor: "white",
             borderRadius: 2,
-            minHeight: "78vh",
+            minHeight: "76vh",
             width: "85%",
             paddingTop: 6,
             paddingInline: 8,
-            marginTop:2,
-            marginLeft:8
+            marginTop: 2,
+            marginLeft: 8,
           }}
         >
           <Grid container spacing={2}>
@@ -364,6 +375,78 @@ function SingleLead() {
                     </TabList>
                   </Box>
                   <TabPanel value="1">
+                    {notes && notes.length > 0 ? (
+                      <Box
+                        sx={{
+                          width: "100%",
+                          maxWidth: 600,
+                          height: "220px",
+                          overflowY: "auto",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 2,
+                          p: 2,
+                          backgroundColor: "#f5f5f5",
+                          borderRadius: 2,
+                        }}
+                      >
+                        {notes.map((note) => (
+                          <Box key={note._id} sx={{ display: "flex" }}>
+                            <Tooltip title={note.created_by.name} arrow>
+                              <Avatar
+                                sx={{
+                                  bgcolor: "#1976d2",
+                                  width: 32,
+                                  height: 32,
+                                  marginRight: 2,
+                                  marginTop: 1,
+                                }}
+                              >
+                                {note.created_by.name.charAt(0)}
+                              </Avatar>
+                            </Tooltip>
+                            <Box
+                              sx={{
+                                color: "#000",
+                                borderRadius: "20px",
+                                padding: "8px 12px",
+                                maxWidth: "80%",
+                                display: "inline-block",
+                                textAlign: "left",
+                                boxShadow: "0px 2px 4px rgba(0,0,0,0.1)",
+                              }}
+                            >
+                              <Typography variant="body1">
+                                {note.note}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  opacity: 0.7,
+                                  display: "block",
+                                  textAlign: "end",
+                                  paddingTop: "2px",
+                                  fontSize: "10px",
+                                  paddingLeft: 10,
+                                }}
+                              >
+                                {new Date(note.createdAt).toLocaleTimeString()}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        ))}
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          textAlign: "center",
+                          marginTop: 10,
+                          marginBottom: 10,
+                        }}
+                      >
+                        No notes available for this lead.
+                      </Box>
+                    )}
                     <Box
                       sx={{
                         marginTop: 4,
@@ -468,14 +551,14 @@ function SingleLead() {
                           ))}
                         </List>
                       )}
-                      <Box
-                        sx={{ width: "100%", height: "300px", marginTop: 4 }}
-                      >
-                        {rows.length === 0 ? (
-                          <Box sx={{ textAlign: "center", marginTop: 5 }}>
-                            No files available for this lead.
-                          </Box>
-                        ) : (
+                      {rows.length === 0 ? (
+                        <Box sx={{ textAlign: "center", marginTop: 5 }}>
+                          No files available for this lead.
+                        </Box>
+                      ) : (
+                        <Box
+                          sx={{ width: "100%", height: "300px", marginTop: 4 }}
+                        >
                           <DataGrid
                             rows={rows}
                             columns={columns}
@@ -483,8 +566,8 @@ function SingleLead() {
                             rowsPerPageOptions={[5]}
                             pagination
                           />
-                        )}
-                      </Box>
+                        </Box>
+                      )}
                     </Box>
                   </TabPanel>
                 </TabContext>

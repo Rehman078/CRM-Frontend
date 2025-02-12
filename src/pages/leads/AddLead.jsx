@@ -47,7 +47,6 @@ function AddLead() {
 
   const handleLead = async (data) => {
     try {
-      console.log(data);
       await addleads(data);
       toast.success("Lead added successfully.");
     } catch (error) {
@@ -66,7 +65,7 @@ function AddLead() {
       <AppBarComponent handleLogout={handleLogout} />
       <DrawerComponent />
       <Toaster position="top-right" reverseOrder={false} />
-      <Box sx={{ marginTop:10, marginLeft:10 }}>
+      <Box sx={{ marginTop: 10, marginLeft: 10 }}>
         <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
           {breadcrumbItems.map((item, index) =>
             item.isLast ? (

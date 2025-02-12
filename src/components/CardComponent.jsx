@@ -49,9 +49,9 @@ export default function CardComponent({ title, count, content }) {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              borderRadius:"50%",
-              fontWeight:"bold",
-              color:"#1f283e"
+              borderRadius: "50%",
+              fontWeight: "bold",
+              color: "#1f283e",
             }}
           >
             {count}

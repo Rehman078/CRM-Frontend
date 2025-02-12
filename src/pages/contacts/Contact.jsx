@@ -27,6 +27,7 @@ import {
   assignContact,
 } from "../../services/ContactApi";
 import { getUsers } from "../../services/AuthApi";
+import CustomDeleteDialog from "../../components/CustomDialog";
 
 function Contact() {
   const [contacts, setContacts] = useState([]);
@@ -37,6 +38,9 @@ function Contact() {
 
   const [openModel, setOpenModel] = useState(false);
   const [currentContactId, setCurrentContactId] = useState(null);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdminOrManager = user?.role === "Admin" || user?.role === "Manager";
@@ -57,13 +61,22 @@ function Contact() {
     navigate("/login"); // Redirect to login
   };
 
+  //dialog
+  const handleDialogOpen = (contactId) => {
+    setContactToDelete(contactId);
+    setDialogOpen(true);
+  };
+
   //delete contact
-  const handleDelete = async (id) => {
+  const handleDelete = async (contactToDelete) => {
     try {
-      await deleteContacts(id);
+      console.log(contactToDelete)
+      await deleteContacts(contactToDelete);
       setContacts((prevContacts) =>
-        prevContacts.filter((contact) => contact._id !== id)
+        prevContacts.filter((contact) => contact._id !== contactToDelete)
       );
+      setDialogOpen(false);
+      setContactToDelete(null);
       toast.success("Contact deleted successfully.");
     } catch (error) {
       toast.error("Error deleting contact.");
@@ -90,31 +103,32 @@ function Contact() {
       toast.error("Contact is already Assigned to SaleRep.");
     }
   };
+  const fetchContactsData = async () => {
+    try {
+      const response = await getContacts();
+      setContacts(response.data);
+    } catch (error) {
+      console.error("Error fetching contacts: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //fetch Salereps
+  const fetchUsersData = async () => {
+    try {
+      const response = await getUsers();
+      const filteredUsers = response.data.filter(
+        (user) => user.role === "SalesRep"
+      );
+      setUsers(filteredUsers);
+    } catch (error) {
+      console.error("Error fetching users: " + error.message);
+    }
+  };
+
 
   useEffect(() => {
-    const fetchContactsData = async () => {
-      try {
-        const response = await getContacts();
-        setContacts(response.data);
-      } catch (error) {
-        console.error("Error fetching contacts: " + error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    //fetch Salereps
-    const fetchUsersData = async () => {
-      try {
-        const response = await getUsers();
-        const filteredUsers = response.data.filter(
-          (user) => user.role === "SalesRep"
-        );
-        setUsers(filteredUsers);
-      } catch (error) {
-        console.error("Error fetching users: " + error.message);
-      }
-    };
 
     fetchContactsData();
     fetchUsersData();
@@ -209,7 +223,7 @@ function Contact() {
               {(contact.created_by.role === "SalesRep" &&
                 user?.role === "SalesRep") ||
               ["Admin", "Manager"].includes(user?.role) ? (
-                <IconButton onClick={() => handleDelete(contact._id)}>
+                <IconButton onClick={() => handleDialogOpen(contact._id)}>
                   <DeleteOutlineOutlinedIcon
                     sx={{ color: "red", fontSize: "30px" }}
                   />
@@ -227,7 +241,7 @@ function Contact() {
     filterType: "dropdown",
     responsive: "standard",
     selectableRows: "none",
-    rowsPerPage: 4,
+    rowsPerPage: 5,
     rowsPerPageOptions: [5, 10, 25, 50],
     search: true,
     download: false,
@@ -369,6 +383,16 @@ function Contact() {
             </Box>
           </Box>
         </Modal>
+
+        {/* Delete Dialog */}
+        <CustomDeleteDialog
+          open={dialogOpen}
+          handleClose={() => setDialogOpen(false)}
+          title="Confirm Action"
+          content="Are you sure you want to delete this contact?"
+          onConfirm={() => handleDelete(contactToDelete)}
+          btn="Delete"
+        />
       </Box>
     </>
   );

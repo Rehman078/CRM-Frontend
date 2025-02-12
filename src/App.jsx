@@ -11,7 +11,6 @@ import Lead from "./pages/leads/Lead";
 import AddLead from "./pages/leads/AddLead";
 import EditLead from "./pages/leads/EditLead";
 import SingleLead from "./pages/leads/SingleLead";
-import TestPage from "./pages/TestPage";
 function App() {
   return (
     <AuthProvider>
@@ -95,9 +94,6 @@ function App() {
               </ProtectedRoute>
             }
           ></Route>
-          <Route path="/test" element={<TestPage/>}>
-
-          </Route>
         </Routes>
       </BrowserRouter>
     </AuthProvider>

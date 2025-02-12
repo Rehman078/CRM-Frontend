@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import CustomDialog from "../../components/CustomDialog";
 import {
   Box,
   Button,
@@ -12,6 +13,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
+
 import MUIDataTable from "mui-datatables";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -33,6 +35,8 @@ function Lead() {
   const [assignedUsers, setAssignedUsers] = useState([]);
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [leadToDelete, setLeadToDelete] = useState(null);
 
   // For delete button
   const user = JSON.parse(localStorage.getItem("user"));
@@ -54,11 +58,21 @@ function Lead() {
     setCurrentLeadId(null);
   };
 
+  //dialog
+  const handleDialogOpen = (leadId) => {
+    setLeadToDelete(leadId);
+    setDialogOpen(true);
+  };
+
   // Delete lead
-  const handleDelete = async (id) => {
+  const handleDelete = async (leadToDelete) => {
     try {
-      await deleteLead(id);
-      setLeads((prevLeads) => prevLeads.filter((lead) => lead._id !== id));
+      await deleteLead(leadToDelete);
+      setLeads((prevLeads) =>
+        prevLeads.filter((lead) => lead._id !== leadToDelete)
+      );
+      setDialogOpen(false);
+      setLeadToDelete(null);
       toast.success("Lead deleted successfully.");
     } catch (error) {
       toast.error("Error deleting lead.");
@@ -206,7 +220,7 @@ function Lead() {
               ["Admin", "Manager"].includes(user?.role) ? (
                 <IconButton
                   color="secondary"
-                  onClick={() => handleDelete(lead._id)}
+                  onClick={() => handleDialogOpen(lead._id)}
                 >
                   <DeleteOutlineOutlinedIcon
                     sx={{ color: "red", fontSize: 30 }}
@@ -363,6 +377,16 @@ function Lead() {
             </Box>
           </Box>
         </Modal>
+
+        {/* Delete Dialog */}
+        <CustomDialog
+          open={dialogOpen}
+          handleClose={() => setDialogOpen(false)}
+          title="Confirm Action"
+          content="Are you sure you want to delete this lead?"
+          onConfirm={() => handleDelete(leadToDelete)}
+          btn="Delete"
+        />
       </Box>
     </Box>
   );

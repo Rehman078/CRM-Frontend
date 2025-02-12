@@ -25,7 +25,9 @@ import {
   CircularProgress,
   Alert,
   Breadcrumbs,
-  Link
+  Link,
+  Card,
+  CardContent,
 } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Toaster, toast } from "react-hot-toast";
@@ -34,7 +36,7 @@ import AppBarComponent from "../../components/AppBar";
 import DrawerComponent from "../../components/SideBar";
 import { useAuth } from "../../context/AuthContaxt";
 import { getcontactsById } from "../../services/ContactApi";
-import { addNote } from "../../services/NoteApi";
+import { addNote, getNotesByContactId } from "../../services/NoteApi";
 import {
   addFiles,
   getFilesByContactId,
@@ -53,6 +55,7 @@ function SingleContact() {
 
   const [contact, setContact] = useState(null);
   const [files, setFiles] = useState([]);
+  const [notes, setNotes] = useState([]);
 
   //tab value
   const [value, setValue] = useState("1");
@@ -97,6 +100,7 @@ function SingleContact() {
     }
     try {
       await addNote(note);
+      fetchNote();
       toast.success("Note added successfully.");
       setNote({ ...note, note: "" });
     } catch (error) {
@@ -148,6 +152,15 @@ function SingleContact() {
     }
   };
 
+  const fetchNote = async () => {
+    try {
+      const response = await getNotesByContactId(id);
+      setNotes(response.data);
+    } catch (error) {
+      console.error("Error fetching note:", error);
+    }
+  };
+
   //file delete
   const handleFileDelete = async (fileId) => {
     try {
@@ -172,6 +185,7 @@ function SingleContact() {
     };
 
     fetchContact();
+    fetchNote();
     fetchFile();
   }, [id]);
 
@@ -213,23 +227,21 @@ function SingleContact() {
     {
       field: "createdAt",
       headerName: "Created At",
-      width: 150,
+      width: 100,
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 100,
+      width: 80,
       renderCell: (params) => {
-        return (params.row.uploaded_by_role === "SalesRep" &&
-          user?.role === "SalesRep") ||
-          ["Admin", "Manager"].includes(user?.role) ? (
+        return (
           <IconButton
             onClick={() => handleFileDelete(params.row.fileId)}
             color="error"
           >
             <DeleteIcon />
           </IconButton>
-        ) : null;
+        );
       },
     },
   ];
@@ -250,10 +262,8 @@ function SingleContact() {
   ];
   return (
     <Box>
-      <AppBarComponent
-        handleLogout={handleLogout}
-      />
-      <DrawerComponent  />
+      <AppBarComponent handleLogout={handleLogout} />
+      <DrawerComponent />
       <Toaster position="top-right" reverseOrder={false} />
       <Box
         sx={{
@@ -281,7 +291,7 @@ function SingleContact() {
           )}
         </Breadcrumbs>
       </Box>
-      <Box sx={{ display: "flex", justifyContent: "center", mt:2, ml:6 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2, ml: 6 }}>
         <Paper
           elevation={5}
           sx={{
@@ -370,6 +380,79 @@ function SingleContact() {
                     </TabList>
                   </Box>
                   <TabPanel value="1">
+                    {notes && notes.length > 0 ? (
+                      <Box
+                        sx={{
+                          width: "100%",
+                          maxWidth: 600,
+                          height: "220px",
+                          overflowY: "auto",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 2,
+                          p: 2,
+                          backgroundColor: "#f5f5f5",
+                          borderRadius: 2,
+                        }}
+                      >
+                        {notes.map((note) => (
+                          <Box key={note._id} sx={{ display: "flex" }}>
+                            <Tooltip title={note.created_by.name} arrow>
+                              <Avatar
+                                sx={{
+                                  bgcolor: "#1976d2",
+                                  width: 32,
+                                  height: 32,
+                                  marginRight: 2,
+                                  marginTop: 1,
+                                }}
+                              >
+                                {note.created_by.name.charAt(0)}
+                              </Avatar>
+                            </Tooltip>
+                            <Box
+                              sx={{
+                                color: "#000",
+                                borderRadius: "20px",
+                                padding: "8px 12px",
+                                maxWidth: "80%",
+                                display: "inline-block",
+                                textAlign: "left",
+                                boxShadow: "0px 2px 4px rgba(0,0,0,0.1)",
+                              }}
+                            >
+                              <Typography variant="body1">
+                                {note.note}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  opacity: 0.7,
+                                  display: "block",
+                                  textAlign: "end",
+                                  paddingTop: "2px",
+                                  fontSize: "10px",
+                                  paddingLeft: 10,
+                                }}
+                              >
+                                {new Date(note.createdAt).toLocaleTimeString()}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        ))}
+                      </Box>
+                    ) : (
+                      <Box
+                        sx={{
+                          textAlign: "center",
+                          marginTop: 10,
+                          marginBottom: 10,
+                        }}
+                      >
+                        No notes available for this contact.
+                      </Box>
+                    )}
+
                     <Box
                       sx={{
                         marginTop: 4,
@@ -475,14 +558,14 @@ function SingleContact() {
                           ))}
                         </List>
                       )}
-                      <Box
-                        sx={{ width: "100%", marginTop: 4, height: "300px" }}
-                      >
-                        {rows.length === 0 ? (
-                          <Box sx={{ textAlign: "center", marginTop: 5 }}>
-                            No files available, for this contact.
-                          </Box>
-                        ) : (
+                      {rows.length === 0 ? (
+                        <Box sx={{ textAlign: "center", marginTop: 5 }}>
+                          No files available, for this contact.
+                        </Box>
+                      ) : (
+                        <Box
+                          sx={{ width: "100%", marginTop: 4, height: "300px" }}
+                        >
                           <DataGrid
                             rows={rows}
                             columns={columns}
@@ -490,8 +573,8 @@ function SingleContact() {
                             rowsPerPageOptions={[5]}
                             pagination
                           />
-                        )}
-                      </Box>
+                        </Box>
+                      )}
                     </Box>
                   </TabPanel>
                 </TabContext>
