@@ -8,10 +8,12 @@ import CardComponent from "../components/CardComponent";
 import { getUsers } from "../services/AuthApi";
 import { getContacts } from "../services/ContactApi";
 import { getLeads } from "../services/LeadApi";
+import { getOpportunities } from "../services/OpporunityApi";
 export default function MiniDrawer() {
   const [userCount, setUserCount] = useState(0);
   const [contactCount, setContactCount] = useState(0);
   const [leadCount, setLeadCount] = useState(0);
+  const [opportunityCount, setOpportunityCount] = useState(0);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -39,7 +41,6 @@ export default function MiniDrawer() {
     try {
       const contacts = await getContacts();
       setContactCount(contacts.data.length);
-      t;
     } catch (error) {
       console.error("Error fetching contact:", error);
     }
@@ -50,16 +51,26 @@ export default function MiniDrawer() {
     try {
       const leads = await getLeads();
       setLeadCount(leads.data.length);
-      t;
     } catch (error) {
       console.error("Error fetching lead:", error);
     }
   };
 
+  
+  //fetch lead count
+  const fetchOpporunityCount = async () => {
+    try {
+      const opportunites = await getOpportunities();
+      setOpportunityCount(opportunites.data.length);
+    } catch (error) {
+      console.error("Error fetching opportunity:", error);
+    }
+  };
   useEffect(() => {
     fetchUserCount();
     fetchContactCount();
     fetchLeadCount();
+    fetchOpporunityCount();
   }, []);
 
   const cardData = [
@@ -78,7 +89,7 @@ export default function MiniDrawer() {
     },
     {
       title: "Opportunity",
-      count: "0",
+      count: `${opportunityCount}`,
       content: "Identify new business deals.",
     },
   ];

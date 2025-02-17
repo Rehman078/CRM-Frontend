@@ -13,6 +13,9 @@ import Divider from "@mui/material/Divider";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PersonIcon from "@mui/icons-material/Person";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import { Group } from "@mui/icons-material";
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
+
 
 const drawerWidth = 73;
 
@@ -26,19 +29,21 @@ const Drawer = styled(MuiDrawer)({
 });
 
 export default function DrawerComponent() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isAdminOrManager = user?.role === "Admin" || user?.role === "Manager";
   return (
     <Drawer variant="permanent">
-     <Link to="/">
-     <Box
-        component="img"
-        src={logo}
-        alt="logo"
-        sx={{
-          width: "90px",
-          height: "70px",
-        }}
-      />
-     </Link>
+      <Link to="/">
+        <Box
+          component="img"
+          src={logo}
+          alt="logo"
+          sx={{
+            width: "90px",
+            height: "70px",
+          }}
+        />
+      </Link>
       <Divider />
       <List>
         <Link to="/" style={{ textDecoration: "none" }}>
@@ -113,6 +118,58 @@ export default function DrawerComponent() {
           </ListItem>
         </Link>
         <Divider />
+        {isAdminOrManager && (
+          <>
+            <Link to="/pipline" style={{ textDecoration: "none" }}>
+              <ListItem disablePadding>
+                <ListItemButton sx={{ flexDirection: "column" }}>
+                  <ListItemIcon sx={{ minWidth: "auto" }}>
+<TrackChangesIcon sx={{ color: "#1f283e", fontSize: 30 }} /> 
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: "12px",
+                          color: "#1f283e",
+                          textAlign: "center",
+                        }}
+                      >
+                        Pipline
+                      </Typography>
+                    }
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Divider />
+            <Link to="/opportunity" style={{ textDecoration: "none" }}>
+              <ListItem disablePadding>
+                <ListItemButton sx={{ flexDirection: "column" }}>
+                  <ListItemIcon sx={{ minWidth: "auto" }}>
+                    <Group sx={{ color: "#1f283e", fontSize: 30 }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: "12px",
+                          color: "#1f283e",
+                          textAlign: "center",
+                        }}
+                      >
+                        Opporunity
+                      </Typography>
+                    }
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Divider />
+          </>
+        )}
       </List>
     </Drawer>
   );

@@ -13,7 +13,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-
+import BreadLink from "@mui/material/Link";
 import MUIDataTable from "mui-datatables";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -130,7 +130,7 @@ function Lead() {
       label: "ID",
       options: {
         customBodyRenderLite: (dataIndex) => {
-          return <div>{dataIndex + 1}</div>;
+          return <div style={{ textAlign: "center" }}>{dataIndex + 1}</div>;
         },
       },
     },
@@ -159,7 +159,7 @@ function Lead() {
       options: {
         customBodyRenderLite: (dataIndex) => {
           const lead = leads[dataIndex];
-          return <div>{lead.contactinfo}</div>;
+          return <div style={{ textAlign: "center" }}>{lead.contactinfo}</div>;
         },
       },
     },
@@ -169,7 +169,7 @@ function Lead() {
       options: {
         customBodyRenderLite: (dataIndex) => {
           const lead = leads[dataIndex];
-          return <div>{lead.leadsource}</div>;
+          return <div style={{ textAlign: "center" }}>{lead.leadsource}</div>;
         },
       },
     },
@@ -179,7 +179,7 @@ function Lead() {
       options: {
         customBodyRenderLite: (dataIndex) => {
           const lead = leads[dataIndex];
-          return <div>{lead.status}</div>;
+          return <div style={{ textAlign: "center" }}>{lead.status}</div>;
         },
       },
     },
@@ -189,7 +189,7 @@ function Lead() {
       options: {
         customBodyRenderLite: (dataIndex) => {
           const lead = leads[dataIndex];
-          return <div>{lead.created_by?.name || "Unknown"}</div>;
+          return <div style={{ textAlign: "center" }}>{lead.created_by?.name}</div>;
         },
       },
     },
@@ -272,14 +272,14 @@ function Lead() {
                   {item.label}
                 </Typography>
               ) : (
-                <Link
+                <BreadLink
                   key={index}
                   underline="hover"
                   sx={{ color: "#a5bae5" }}
                   href={item.href}
                 >
                   {item.label}
-                </Link>
+                </BreadLink>
               )
             )}
           </Breadcrumbs>

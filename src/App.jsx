@@ -11,7 +11,12 @@ import Lead from "./pages/leads/Lead";
 import AddLead from "./pages/leads/AddLead";
 import EditLead from "./pages/leads/EditLead";
 import SingleLead from "./pages/leads/SingleLead";
+import Pipline from "./pages/pipline/Pipline";
+import Stage from "./pages/stages/Stage"
+import Opportunity from "./pages/opporunity/Opportunity";
+import AddOppotunity from "./pages/opporunity/AddOpportunity";
 function App() {
+
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -91,6 +96,43 @@ function App() {
             element={
               <ProtectedRoute>
                 <SingleLead />
+              </ProtectedRoute>
+            }
+          ></Route>
+
+          {/* Pipline */}
+          <Route
+            path="/pipline"
+            element={
+              <ProtectedRoute>
+                <Pipline />
+              </ProtectedRoute>
+            }
+          ></Route>
+           {/*Stage */}
+           <Route
+            path="/stage/:id"
+            element={
+              <ProtectedRoute>
+                <Stage />
+              </ProtectedRoute>
+            }
+          ></Route>
+          {/* opportunity */}
+          <Route
+            path="/opportunity"
+            element={
+              <ProtectedRoute>
+                <Opportunity />
+              </ProtectedRoute>
+            }
+          ></Route>
+           {/* opportunity */}
+           <Route
+            path="/add/opportunity/:id"
+            element={
+              <ProtectedRoute>
+                <AddOppotunity />
               </ProtectedRoute>
             }
           ></Route>

@@ -4,6 +4,8 @@ import { useAuth } from "../../context/AuthContaxt";
 import { Link } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import MUIDataTable from "mui-datatables";
+import BreadLink from "@mui/material/Link";
+
 import {
   Box,
   Button,
@@ -141,7 +143,7 @@ function Contact() {
       label: "ID",
       options: {
         customBodyRenderLite: (dataIndex) => {
-          return <div>{dataIndex + 1}</div>;
+          return <div style={{ textAlign: "center" }}>{dataIndex + 1}</div>;
         },
       },
     },
@@ -152,7 +154,7 @@ function Contact() {
         customBodyRenderLite: (dataIndex) => {
           const contact = contacts[dataIndex];
           return (
-            <Link to={`/contactdetail/${contact._id}`}>{contact.name}</Link>
+            <Link to={`/contactdetail/${contact._id}`} style={{ textAlign: "center" }}>{contact.name}</Link>
           );
         },
       },
@@ -163,7 +165,7 @@ function Contact() {
       options: {
         customBodyRenderLite: (dataIndex) => {
           const contact = contacts[dataIndex];
-          return <div>{contact.email}</div>;
+          return <div style={{ textAlign: "center" }}>{contact.email}</div>;
         },
       },
     },
@@ -173,7 +175,7 @@ function Contact() {
       options: {
         customBodyRenderLite: (dataIndex) => {
           const contact = contacts[dataIndex];
-          return <div>{contact.phone}</div>;
+          return <div style={{ textAlign: "center" }}>{contact.phone}</div>;
         },
       },
     },
@@ -183,7 +185,7 @@ function Contact() {
       options: {
         customBodyRenderLite: (dataIndex) => {
           const contact = contacts[dataIndex];
-          return <div>{contact.company}</div>;
+          return <div style={{ textAlign: "center" }}>{contact.company}</div>;
         },
       },
     },
@@ -193,7 +195,7 @@ function Contact() {
       options: {
         customBodyRenderLite: (dataIndex) => {
           const contact = contacts[dataIndex];
-          return <div>{contact.created_by?.name || "Unknown"}</div>;
+          return <div style={{ textAlign: "center" }}>{contact.created_by?.name || "Unknown"}</div>;
         },
       },
     },
@@ -278,14 +280,14 @@ function Contact() {
                   {item.label}
                 </Typography>
               ) : (
-                <Link
+                <BreadLink
                   key={index}
                   underline="hover"
                   sx={{ color: "#a5bae5" }}
                   href={item.href}
                 >
                   {item.label}
-                </Link>
+                </BreadLink>
               )
             )}
           </Breadcrumbs>
