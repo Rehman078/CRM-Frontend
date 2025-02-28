@@ -26,15 +26,23 @@ import {
   Alert,
   Breadcrumbs,
   Link,
+  TableContainer,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  
 } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Toaster, toast } from "react-hot-toast";
+import { ToastContainer, toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 import AppBarComponent from "../../components/AppBar";
 import DrawerComponent from "../../components/SideBar";
 import { useAuth } from "../../context/AuthContaxt";
 import { getLeadsById } from "../../services/LeadApi";
 import { addNote, getNotesByLeadId } from "../../services/NoteApi";
+import { getOpportuntyByLeadId } from "../../services/OpporunityApi";
+import InfoModal from "../../components/InfoModal";
 import {
   addFiles,
   getFilesByLeadId,
@@ -51,6 +59,11 @@ function SingleLead() {
 
   const [lead, setLead] = useState(null);
   const [notes, setNotes] = useState([]);
+  const [opportunities, setOpportunities] = useState([]);
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   //tab value
   const [value, setValue] = useState("1");
@@ -157,6 +170,16 @@ function SingleLead() {
       console.error("Error fetching file:", error);
     }
   };
+
+  //fetch opporuniity
+  const fetchOpportunity = async () => {
+    try {
+      const response = await getOpportuntyByLeadId(id);
+      setOpportunities(response.data[0]);
+    } catch (error) {
+      console.error("Error fetching opportunity:", error);
+    }
+  };
   //file delete
   const handleFileDelete = async (fileId) => {
     try {
@@ -181,6 +204,7 @@ function SingleLead() {
     fetchLead();
     fetchNote();
     fetchFile();
+    fetchOpportunity();
   }, [id]);
 
   const columns = [
@@ -260,7 +284,7 @@ function SingleLead() {
     <Box>
       <AppBarComponent handleLogout={handleLogout} />
       <DrawerComponent />
-      <Toaster position="top-right" reverseOrder={false} />
+         <ToastContainer position="top-right" autoClose={2000} />
       <Box
         sx={{
           marginTop: 10,
@@ -345,6 +369,37 @@ function SingleLead() {
                     <Typography variant="body1" color="gray">
                       No one assigned yet.
                     </Typography>
+                  )}
+
+                  {/* Displaying opportunity details */}
+                  <Typography
+                    variant="h5"
+                    fontWeight="bold"
+                    sx={{ marginTop: 2 }}
+                    gutterBottom
+                  >
+                    Opportunity Details
+                  </Typography>
+
+                  {!opportunities || opportunities.length === 0 ? (
+                    <Typography variant="body1" color="gray">
+                      No opportunity available.
+                    </Typography>
+                  ) : (
+                    <>
+                      <Typography
+                        variant="body1"
+                        sx={{ mb: 1 }}
+                        onClick={handleOpen}
+                        style={{
+                          cursor: "pointer",
+                          textDecoration: "none",
+                        }}
+                      >
+                        <strong>Opportunity Name: </strong>
+                        {opportunities?.name}
+                      </Typography>
+                    </>
                   )}
                 </>
               ) : (
@@ -576,6 +631,56 @@ function SingleLead() {
           </Grid>
         </Paper>
       </Box>
+      <InfoModal
+        open={open}
+        handleClose={handleClose}
+        title={"Opportunity Details"}
+      >
+        <TableContainer>
+          <Table size="small">
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <strong>Opportunity Name:</strong>
+                </TableCell>
+                <TableCell>{opportunities.name}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <strong>Expected Revenue:</strong>
+                </TableCell>
+                <TableCell>${opportunities.expected_revenue}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <strong>Close Date:</strong>
+                </TableCell>
+                <TableCell>
+                  {new Date(opportunities.close_date).toLocaleDateString()}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <strong>Pipeline:</strong>
+                </TableCell>
+                <TableCell>{opportunities.pipelineDetails?.name}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <strong>Stages:</strong>
+                </TableCell>
+                <TableCell>
+                  {opportunities?.stages?.length
+                    ? opportunities.stages
+                        .map((stage) => stage.stage)
+                        .join(", ")
+                    : "No Stages Available"}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </InfoModal>
     </Box>
   );
 }

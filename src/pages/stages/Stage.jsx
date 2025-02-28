@@ -17,7 +17,7 @@ import {
   IconButton,
 } from "@mui/material";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import { Toaster, toast } from "react-hot-toast";
+import { ToastContainer, toast } from "react-toastify";
 import { getStageByPiplineId, addStage, deleteStage } from "../../services/StageAPi";
 import CustomDeleteDialog from "../../components/CustomDialog";
 function Stage() {
@@ -105,8 +105,7 @@ function Stage() {
     <Box sx={{ width: "90%", marginLeft: 9, marginTop: 9 }}>
       <AppBarComponent handleLogout={handleLogout} />
       <DrawerComponent />
-      <Toaster position="top-right" reverseOrder={false} />
-
+      <ToastContainer position="top-right" autoClose={2000} />
       {/* Breadcrumbs */}
       <Box sx={{ paddingBottom: 2, paddingLeft: 2 }}>
         <Breadcrumbs aria-label="breadcrumb">

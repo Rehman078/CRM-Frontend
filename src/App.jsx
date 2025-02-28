@@ -13,8 +13,10 @@ import EditLead from "./pages/leads/EditLead";
 import SingleLead from "./pages/leads/SingleLead";
 import Pipline from "./pages/pipline/Pipline";
 import Stage from "./pages/stages/Stage"
-import Opportunity from "./pages/opporunity/Opportunity";
-import AddOppotunity from "./pages/opporunity/AddOpportunity";
+import Opportunity from "./pages/opportunity/Opportunity";
+import AddOppotunity from "./pages/opportunity/AddOpportunity";
+import SingleOpportunity from "./pages/opportunity/SingleOpportunity";
+import NewOpportunity from "./pages/opportunity/NewOpportunity";
 function App() {
 
   return (
@@ -68,7 +70,7 @@ function App() {
 
           {/* Lead Route */}
           <Route
-            path="/lead"
+            path="/leads"
             element={
               <ProtectedRoute>
                 <Lead />
@@ -127,12 +129,27 @@ function App() {
               </ProtectedRoute>
             }
           ></Route>
-           {/* opportunity */}
+          <Route
+            path="/opportunity/:id"
+            element={
+              <ProtectedRoute>
+                <NewOpportunity />
+              </ProtectedRoute>
+            }
+          ></Route>
            <Route
             path="/add/opportunity/:id"
             element={
               <ProtectedRoute>
                 <AddOppotunity />
+              </ProtectedRoute>
+            }
+          ></Route>
+            <Route
+            path="/opportunities/:id"
+            element={
+              <ProtectedRoute>
+                <SingleOpportunity />
               </ProtectedRoute>
             }
           ></Route>

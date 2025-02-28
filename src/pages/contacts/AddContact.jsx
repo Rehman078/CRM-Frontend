@@ -1,14 +1,13 @@
-import React from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Toaster, toast } from "react-hot-toast";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+
 import {
   TextField,
   Button,
   Box,
   Typography,
-  MenuItem,
-  Select,
-  InputLabel,
   FormControl,
   Chip,
   Card,
@@ -17,21 +16,26 @@ import {
   Breadcrumbs,
   Link,
   FormHelperText,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
-import { addContacts } from "../../services/ContactApi";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContaxt";
+import AddIcon from "@mui/icons-material/Add";
 import AppBarComponent from "../../components/AppBar";
 import DrawerComponent from "../../components/SideBar";
+import { useAuth } from "../../context/AuthContaxt";
+import { addContacts } from "../../services/ContactApi";
 
 function AddContact() {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const [tagInput, setTagInput] = useState("");
+  const [tags, setTags] = useState([]);
 
   const {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -44,7 +48,7 @@ function AddContact() {
     },
   });
 
-  //logout function
+  // Logout function
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -52,15 +56,34 @@ function AddContact() {
 
   // Handle contact form submit
   const handleContact = async (data) => {
+    data.tags = tags; // Assign tags array to form data
     try {
       await addContacts(data);
-      toast.success("Contact added successfully!");
+      toast.success("Contact added successfully!", {
+        onClose: () => navigate("/contacts"), 
+      });
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           "Failed to add contact. Please try again."
       );
     }
+  };
+
+  // Handle adding tags
+  const handleAddTag = () => {
+    if (tagInput.trim() && !tags.includes(tagInput)) {
+      setTags([...tags, tagInput.trim()]);
+      setValue("tags", [...tags, tagInput.trim()]); // Update react-hook-form state
+      setTagInput(""); // Clear input field
+    }
+  };
+
+  // Handle removing tags
+  const handleDeleteTag = (tagToDelete) => {
+    const newTags = tags.filter((tag) => tag !== tagToDelete);
+    setTags(newTags);
+    setValue("tags", newTags); // Update react-hook-form state
   };
 
   // Breadcrumb name
@@ -73,13 +96,8 @@ function AddContact() {
     <Box>
       <AppBarComponent handleLogout={handleLogout} />
       <DrawerComponent />
-      <Box
-        sx={{
-          marginTop: 10,
-          marginLeft: 10,
-        }}
-      >
-        {/* Breadcrum */}
+      <Box sx={{ marginTop: 10, marginLeft: 10 }}>
+        {/* Breadcrumb */}
         <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
           {breadcrumbItems.map((item, index) =>
             item.isLast ? (
@@ -100,14 +118,17 @@ function AddContact() {
         </Breadcrumbs>
       </Box>
       <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <Toaster position="top-right" reverseOrder={false} />
+        <ToastContainer position="top-right" autoClose={2000} />
         <Card
           sx={{
-            margin: "auto",
-            marginTop: 6,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
             maxWidth: 900,
-            paddingBlock: 3,
-            paddingInline: 2,
+            padding: 3,
+            margin: "auto",
+            mt: 5,
           }}
         >
           <CardContent>
@@ -121,10 +142,10 @@ function AddContact() {
                     label="Name"
                     fullWidth
                     margin="normal"
-                    name="name"
-                    variant="outlined"
+                    variant="standard"
                     {...register("name", { required: "Name is required" })}
                     error={!!errors.name}
+                    helperText={errors.name?.message}
                   />
                 </Grid>
 
@@ -133,8 +154,7 @@ function AddContact() {
                     label="Email"
                     fullWidth
                     margin="normal"
-                    name="email"
-                    variant="outlined"
+                    variant="standard"
                     {...register("email", {
                       required: "Email is required",
                       pattern: {
@@ -153,8 +173,7 @@ function AddContact() {
                     label="Phone"
                     fullWidth
                     margin="normal"
-                    name="phone"
-                    variant="outlined"
+                    variant="standard"
                     {...register("phone", { required: "Phone is required" })}
                     error={!!errors.phone}
                     helperText={errors.phone?.message}
@@ -166,8 +185,7 @@ function AddContact() {
                     label="Address"
                     fullWidth
                     margin="normal"
-                    name="address"
-                    variant="outlined"
+                    variant="standard"
                     {...register("address", {
                       required: "Address is required",
                     })}
@@ -181,8 +199,7 @@ function AddContact() {
                     label="Company"
                     fullWidth
                     margin="normal"
-                    name="company"
-                    variant="outlined"
+                    variant="standard"
                     {...register("company", {
                       required: "Company is required",
                     })}
@@ -191,40 +208,46 @@ function AddContact() {
                   />
                 </Grid>
 
+                {/* Tags Input Field */}
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth margin="normal">
-                    <InputLabel>Tags</InputLabel>
-                    <Controller
-                      name="tags"
-                      control={control}
-                      rules={{ required: "One tag is required" }}
-                      render={({ field }) => (
-                        <Select
-                          multiple
-                          {...field}
-                          error={!!errors.tags}
-                          renderValue={(selected) => (
-                            <div>
-                              {selected.map((tag) => (
-                                <Chip
-                                  key={tag}
-                                  label={tag}
-                                  sx={{ margin: 0.5 }}
-                                />
-                              ))}
-                            </div>
-                          )}
-                        >
-                          <MenuItem value="T1">T1</MenuItem>
-                          <MenuItem value="T2">T2</MenuItem>
-                          <MenuItem value="T3">T3</MenuItem>
-                        </Select>
-                      )}
+                    <TextField
+                      label="Tags"
+                      variant="standard"
+                      fullWidth
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={handleAddTag}>
+                              <AddIcon sx={{ color: "#a5bae5" }} />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
                     />
-                    {errors.tags && (
-                      <FormHelperText sx={{ color: "red" }}>
-                        {errors.tags.message}
-                      </FormHelperText>
+
+                    {tags.length > 0 && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 1,
+                          padding: 1,
+                          maxHeight: 70,
+                          overflowY: "auto",
+                        }}
+                      >
+                        {tags.map((tag, index) => (
+                          <Chip
+                            key={index}
+                            label={tag}
+                            onDelete={() => handleDeleteTag(tag)}
+                            sx={{ height: 24 }}
+                          />
+                        ))}
+                      </Box>
                     )}
                   </FormControl>
                 </Grid>

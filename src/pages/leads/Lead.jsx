@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import CustomDialog from "../../components/CustomDialog";
+import FolderOffIcon from '@mui/icons-material/FolderOff';
 import {
   Box,
   Button,
   Breadcrumbs,
   Typography,
-  CircularProgress,
   IconButton,
   Modal,
   FormControl,
@@ -14,10 +14,9 @@ import {
   MenuItem,
 } from "@mui/material";
 import BreadLink from "@mui/material/Link";
-import MUIDataTable from "mui-datatables";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { toast, Toaster } from "react-hot-toast";
+import { toast, ToastContainer } from "react-toastify";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import AssignmentIcon from "@mui/icons-material/Assignment";
@@ -26,9 +25,11 @@ import AppBarComponent from "../../components/AppBar";
 import DrawerComponent from "../../components/SideBar";
 import { getUsers } from "../../services/AuthApi";
 import { getLeads, deleteLead, assignLead } from "../../services/LeadApi";
-
+import { MaterialReactTable } from "material-react-table";
+import "../../table.css"
 function Lead() {
   const [leads, setLeads] = React.useState([]);
+  const [selectedRows, setSelectedRows] = useState({});
   const [openModel, setOpenModel] = useState(false);
   const [currentLeadId, setCurrentLeadId] = useState(null);
   const [users, setUsers] = useState([]);
@@ -124,137 +125,88 @@ function Lead() {
   ];
 
   // table data get
-  const columns = [
+  const columns = useMemo(() => [
     {
-      name: "id",
-      label: "ID",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          return <div style={{ textAlign: "center" }}>{dataIndex + 1}</div>;
-        },
-      },
+      accessorKey: "id",
+      header: "ID",
+      size: 5,
+      Cell: ({ row }) => <div>{row.index + 1}</div>,
     },
     {
-      name: "name",
-      label: "Lead Name",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const lead = leads[dataIndex];
-          return (
-            <div>
-              <Link
-                to={`/leaddetail/${lead._id}`}
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                {lead.name}
-              </Link>
-            </div>
-          );
-        },
-      },
+      accessorKey: "name",
+      header: "Lead Name",
+      size: 40,
+      Cell: ({ row }) => (
+        <Link
+          to={`/leaddetail/${row.original._id}`}
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          {row.original.name}
+        </Link>
+      ),
     },
     {
-      name: "contactinfo",
-      label: "Lead Contact",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const lead = leads[dataIndex];
-          return <div style={{ textAlign: "center" }}>{lead.contactinfo}</div>;
-        },
-      },
+      accessorKey: "contactinfo",
+      header: "Lead Contact",
+      size: 30,
+      Cell: ({ row }) => <div>{row.original.contactinfo}</div>,
     },
     {
-      name: "leadsource",
-      label: "Lead Source",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const lead = leads[dataIndex];
-          return <div style={{ textAlign: "center" }}>{lead.leadsource}</div>;
-        },
-      },
+      accessorKey: "leadsource",
+      header: "Lead Source",
+      size: 50,
+      Cell: ({ row }) => <div>{row.original.leadsource}</div>,
     },
     {
-      name: "status",
-      label: "Status",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const lead = leads[dataIndex];
-          return <div style={{ textAlign: "center" }}>{lead.status}</div>;
-        },
-      },
+      accessorKey: "status",
+      header: "Status",
+      size: 50,
+      Cell: ({ row }) => <div>{row.original.status}</div>,
     },
     {
-      name: "created_by",
-      label: "Created",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const lead = leads[dataIndex];
-          return <div style={{ textAlign: "center" }}>{lead.created_by?.name}</div>;
-        },
-      },
+      accessorKey: "created_by",
+      header: "Created",
+      size: 40,
+      Cell: ({ row }) => (
+        <div>{row.original.created_by?.name || "Unknown"}</div>
+      ),
     },
     {
-      name: "actions",
-      label: "Actions",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const lead = leads[dataIndex];
-          return (
-            <div>
-              {isAdminOrManager && (
-                <IconButton
-                  sx={{ paddingRight: "14px" }}
-                  onClick={() => handleOpen(lead._id)}
-                >
-                  <AssignmentIcon sx={{ color: "#1f283e", fontSize: "27px" }} />
-                </IconButton>
-              )}
-              <Link to={`/editlead/${lead._id}`}>
-                <IconButton color="primary">
-                  <BorderColorOutlinedIcon
-                    sx={{ color: "blue", fontSize: 26 }}
-                  />
-                </IconButton>
-              </Link>
-              {lead.created_by.id === user?.id ||
-              ["Admin", "Manager"].includes(user?.role) ? (
-                <IconButton
-                  color="secondary"
-                  onClick={() => handleDialogOpen(lead._id)}
-                >
-                  <DeleteOutlineOutlinedIcon
-                    sx={{ color: "red", fontSize: 30 }}
-                  />
-                </IconButton>
-              ) : null}
-            </div>
-          );
-        },
+      accessorKey: "actions",
+      header: "Actions",
+      Cell: ({ row }) => {
+        const lead = row.original;
+        return (
+          <div>
+            {isAdminOrManager && (
+              <IconButton onClick={() => handleOpen(lead._id)}>
+                <AssignmentIcon sx={{ color: "#1f283e", fontSize: "25px" }} />
+              </IconButton>
+            )}
+            <Link to={`/editlead/${lead._id}`}>
+              <IconButton color="primary">
+                <BorderColorOutlinedIcon sx={{ color: "blue", fontSize: 23 }} />
+              </IconButton>
+            </Link>
+            {(lead.created_by.role === "SalesRep" && user?.role === "SalesRep") ||
+            ["Admin", "Manager"].includes(user?.role) ? (
+              <IconButton onClick={() => handleDialogOpen(lead._id)}>
+                <DeleteOutlineOutlinedIcon sx={{ color: "red", fontSize: "25px" }} />
+              </IconButton>
+            ) : null}
+          </div>
+        );
       },
     },
-  ];
-
-  const options = {
-    filter: true,
-    filterType: "dropdown",
-    responsive: "standard",
-    selectableRows: "none",
-    rowsPerPage: 4,
-    rowsPerPageOptions: [4, 10, 25, 50],
-    search: true,
-    download: false,
-    print: false,
-    viewColumns: true,
-    pagination: true,
-    sort: true,
-  };
+  ], [isAdminOrManager, user]);
+  
 
   return (
     <Box sx={{ width: "90%", marginLeft: 9, marginTop: 9 }}>
       <AppBarComponent handleLogout={handleLogout} />
       <DrawerComponent />
       <Box>
-        <Toaster position="top-right" reverseOrder={false} />
+      <ToastContainer position="top-right" autoClose={2000} />
 
         <Box>
           {/* BreadCrum */}
@@ -301,11 +253,55 @@ function Lead() {
 
         {/* Table Container */}
         <Box sx={{ marginLeft: 10, marginTop: 3 }}>
-          <MUIDataTable
-            title="Lead List"
-            data={leads}
+        <MaterialReactTable
             columns={columns}
-            options={options}
+            data={leads}
+            getRowId={(row) => row.id}
+            enableRowSelection
+            enableDensityToggle={false}
+            enableExpandAll={false}
+            enableColumnFilters={false}
+            onRowSelectionChange={setSelectedRows}
+            state={{ rowSelection: selectedRows }}
+            muiTableBodyRowProps={({ row }) => ({
+              sx: (theme) => ({
+                backgroundColor: selectedRows?.[row.id] ? "#FFCDD2" : "inherit",
+                "&:hover": {
+                  backgroundColor: selectedRows?.[row.id]
+                    ? "#D32F2F"
+                    : "#FCE4EC",
+                },
+              }),
+            })}
+            muiTableContainerProps={{ sx: { width: "100%" } }}
+            muiTableHeadCellProps={{
+              sx: {
+                backgroundColor: "#055266",
+                color: "white",
+                fontSize: "12px",
+                padding: "4px 8px",
+              },
+            }}
+            muiTableBodyCellProps={{
+              sx: {
+                fontSize: "12px",
+                padding: "4px 8px",
+              },
+            }}
+            renderEmptyRowsFallback={() => (
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                height="120px"
+              >
+                <FolderOffIcon sx={{color:"gray", fontSize:"30px"}} />
+                <Typography variant="body1" color="#0d576b" sx={{color:"gray", fontSize:"15px"}}>
+                  No Lead Available
+                </Typography>
+              </Box>
+            )}
           />
         </Box>
 

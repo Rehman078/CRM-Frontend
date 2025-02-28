@@ -94,7 +94,7 @@ export default function DrawerComponent() {
           </ListItem>
         </Link>
         <Divider />
-        <Link to="/lead" style={{ textDecoration: "none" }}>
+        <Link to="/leads" style={{ textDecoration: "none" }}>
           <ListItem disablePadding>
             <ListItemButton sx={{ flexDirection: "column" }}>
               <ListItemIcon sx={{ minWidth: "auto" }}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContaxt";
 import AppBarComponent from "../../components/AppBar";
@@ -15,22 +15,26 @@ import {
 import BreadLink from "@mui/material/Link";
 import { Link } from "react-router-dom";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import MUIDataTable from "mui-datatables";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { MaterialReactTable } from "material-react-table";
+
 import {
   getPiplines,
   addPiplines,
   deletePiplines,
 } from "../../services/PiplineApi";
-import { Toaster, toast } from "react-hot-toast";
+import { ToastContainer, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import CustomDeleteDialog from "../../components/CustomDialog";
 import CustomModal from "../../components/CustomModel";
-
+import "../../table.css"
+import FolderOffIcon from '@mui/icons-material/FolderOff';
 function Pipline() {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
   const [piplines, setPiplines] = useState([]);
+    const [selectedRows, setSelectedRows] = useState({});
   const [openModel, setOpenModel] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [piplineToDelete, setPiplineToDelete] = useState(null);
@@ -105,73 +109,61 @@ function Pipline() {
   }, []);
 
   // Table Columns
-  const columns = [
+  const columns = useMemo(() => [
     {
-      name: "id",
-      label: "ID",
-      options: {
-        customBodyRenderLite: (dataIndex) => <div>{dataIndex + 1}</div>,
-      },
+      accessorKey: "id",
+      header: "ID",
+      size: 5,
+      Cell: ({ row }) => <div>{row.index + 1}</div>,
     },
     {
-      name: "name",
-      label: "Pipline Name",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const pipline = piplines[dataIndex];
-          return <Link to={`/stage/${pipline._id}`}>{pipline.name}</Link>;
-        },
-      },
+      accessorKey: "name",
+      header: "Pipeline Name",
+      size: 40,
+      Cell: ({ row }) => (
+        <Link to={`/stage/${row.original._id}`}>
+          {row.original.name}
+        </Link>
+      ),
     },
     {
-      name: "created",
-      label: "Created By",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const pipline = piplines[dataIndex];
-          return <div>{pipline.created_by.name}</div>;
-        },
-      },
+      accessorKey: "created_by",
+      header: "Created By",
+      size: 40,
+      Cell: ({ row }) => (
+        <div>{row.original.created_by?.name || "Unknown"}</div>
+      ),
     },
     {
-      name: "actions",
-      label: "Actions",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const pipline = piplines[dataIndex];
-          return (
-          <>
-            <IconButton onClick={() => handleDialogOpen(pipline._id)}>
+      accessorKey: "actions",
+      header: "Actions",
+      Cell: ({ row }) => {
+        const pipeline = row.original;
+        return (
+          <div>
+            <IconButton onClick={() => handleDialogOpen(pipeline._id)}>
               <DeleteOutlineOutlinedIcon
-                sx={{ color: "red", fontSize: "30px" }}
+                sx={{ color: "red", fontSize: "25px" }}
               />
             </IconButton>
-            <Link to={`/add/opportunity/${pipline._id}`}>
-        <IconButton color="primary">
-          <AddTaskOutlinedIcon sx={{ color: "blue", fontSize: 26 }} />
-        </IconButton>
-      </Link>
-          </>
-          );
-        },
+            <Link to={`/add/opportunity/${pipeline._id}`}>
+              <IconButton color="primary">
+                <AddTaskOutlinedIcon sx={{ color: "blue", fontSize: 26 }} />
+              </IconButton>
+            </Link>
+
+            <Link to={`/opportunity/${pipeline._id}`}>
+              <IconButton color="primary">
+                {/* <AddTaskOutlinedIcon sx={{ color: "blue", fontSize: 26 }} /> */}
+                <VisibilityIcon sx={{ color: "blue", fontSize: 26 }} />
+              </IconButton>
+            </Link>
+          </div>
+        );
       },
     },
-  ];
+  ], []);
 
-  const options = {
-    filter: true,
-    filterType: "dropdown",
-    responsive: "standard",
-    selectableRows: "none",
-    rowsPerPage: 5,
-    rowsPerPageOptions: [5, 10, 25, 50],
-    search: true,
-    download: false,
-    print: false,
-    viewColumns: true,
-    pagination: true,
-    sort: true,
-  };
 
   const breadcrumbItems = [
     { label: "Dashboard", href: "/" },
@@ -181,7 +173,7 @@ function Pipline() {
     <Box sx={{ width: "90%", marginLeft: 9, marginTop: 9 }}>
       <AppBarComponent handleLogout={handleLogout} />
       <DrawerComponent />
-      <Toaster position="top-right" reverseOrder={false} />
+     <ToastContainer position="top-right" autoClose={2000} />
       {/* Breadcrumbs */}
       <Box sx={{ paddingBottom: 2, paddingLeft: 2 }}>
         <Breadcrumbs aria-label="breadcrumb">
@@ -218,12 +210,56 @@ function Pipline() {
 
       {/* Piplines Table */}
       <Box sx={{ marginLeft: 8 }}>
-        <MUIDataTable
-          title="Pipline List"
-          data={piplines}
-          columns={columns}
-          options={options}
-        />
+      <MaterialReactTable
+            columns={columns}
+            data={piplines}
+            getRowId={(row) => row.id}
+            enableRowSelection
+            enableDensityToggle={false}
+            enableExpandAll={false}
+            enableColumnFilters={false}
+            onRowSelectionChange={setSelectedRows}
+            state={{ rowSelection: selectedRows }}
+            muiTableBodyRowProps={({ row }) => ({
+              sx: (theme) => ({
+                backgroundColor: selectedRows?.[row.id] ? "#FFCDD2" : "inherit",
+                "&:hover": {
+                  backgroundColor: selectedRows?.[row.id]
+                    ? "#D32F2F"
+                    : "#FCE4EC",
+                },
+              }),
+            })}
+            muiTableContainerProps={{ sx: { width: "100%" } }}
+            muiTableHeadCellProps={{
+              sx: {
+                backgroundColor: "#055266",
+                color: "white",
+                fontSize: "12px",
+                padding: "4px 8px",
+              },
+            }}
+            muiTableBodyCellProps={{
+              sx: {
+                fontSize: "12px",
+                padding: "4px 8px",
+              },
+            }}
+            renderEmptyRowsFallback={() => (
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                height="120px"
+              >
+                   <FolderOffIcon sx={{color:"gray", fontSize:"30px"}} />
+                <Typography variant="body1" color="#0d576b" sx={{color:"gray", fontSize:"15px"}}>
+                  No Pipeline Available
+                </Typography>
+              </Box>
+            )}
+          />
       </Box>
 
       {/* Add Pipline Modal */}

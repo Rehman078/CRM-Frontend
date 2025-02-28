@@ -1,5 +1,5 @@
 import React from "react";
-import { Toaster, toast } from "react-hot-toast";
+import { ToastContainer, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import {
   TextField,
@@ -48,7 +48,10 @@ function AddLead() {
   const handleLead = async (data) => {
     try {
       await addleads(data);
-      toast.success("Lead added successfully.");
+      toast.success("Lead added successfully.", {
+        onClose: () => navigate("/leads"), 
+      });
+
     } catch (error) {
       toast.error("Failed to add lead.");
     }
@@ -64,7 +67,7 @@ function AddLead() {
     <Box>
       <AppBarComponent handleLogout={handleLogout} />
       <DrawerComponent />
-      <Toaster position="top-right" reverseOrder={false} />
+      <ToastContainer position="top-right" autoClose={2000} />
       <Box sx={{ marginTop: 10, marginLeft: 10 }}>
         <Breadcrumbs aria-label="breadcrumb" sx={{ color: "#d1c4e9" }}>
           {breadcrumbItems.map((item, index) =>
@@ -107,6 +110,7 @@ function AddLead() {
                     label="Lead Name"
                     fullWidth
                     margin="normal"
+                      variant="standard"
                     {...register("name", { required: "Lead Name is required" })}
                     error={!!errors.name}
                     helperText={errors.name?.message}
@@ -118,6 +122,7 @@ function AddLead() {
                     label="Contact No."
                     fullWidth
                     margin="normal"
+                      variant="standard"
                     {...register("contactinfo", {
                       required: "Contact No. is required",
                     })}
@@ -131,6 +136,7 @@ function AddLead() {
                     label="Lead Source"
                     fullWidth
                     margin="normal"
+                      variant="standard"
                     {...register("leadsource", {
                       required: "Lead Source is required",
                     })}
@@ -143,6 +149,7 @@ function AddLead() {
                   <FormControl
                     fullWidth
                     margin="normal"
+                      variant="standard"
                     error={!!errors.status}
                   >
                     <InputLabel>Status</InputLabel>

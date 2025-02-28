@@ -1,12 +1,4 @@
 import React, { useEffect, useState } from "react";
-import SendIcon from "@mui/icons-material/Send";
-import FilePresentIcon from "@mui/icons-material/FilePresent";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
-import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
-import { deepOrange } from "@mui/material/colors";
-import { DataGrid } from "@mui/x-data-grid";
-import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Box,
   Paper,
@@ -26,15 +18,28 @@ import {
   Alert,
   Breadcrumbs,
   Link,
-  Card,
-  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
 } from "@mui/material";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Toaster, toast } from "react-hot-toast";
-import { useNavigate, useParams } from "react-router-dom";
 import AppBarComponent from "../../components/AppBar";
 import DrawerComponent from "../../components/SideBar";
 import { useAuth } from "../../context/AuthContaxt";
+import InfoModal from "../../components/InfoModal";
+import SendIcon from "@mui/icons-material/Send";
+import FilePresentIcon from "@mui/icons-material/FilePresent";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
+import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { deepOrange } from "@mui/material/colors";
+import { DataGrid } from "@mui/x-data-grid";
+import { ToastContainer, toast } from "react-toastify";
+import { useNavigate, useParams } from "react-router-dom";
+
 import { getcontactsById } from "../../services/ContactApi";
 import { addNote, getNotesByContactId } from "../../services/NoteApi";
 import {
@@ -42,6 +47,8 @@ import {
   getFilesByContactId,
   deleteFileById,
 } from "../../services/FileApi";
+import { getOpportuntyByContactId } from "../../services/OpporunityApi";
+
 
 function SingleContact() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -53,9 +60,14 @@ function SingleContact() {
   const navigate = useNavigate();
   const { id } = useParams();
 
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   const [contact, setContact] = useState(null);
   const [files, setFiles] = useState([]);
   const [notes, setNotes] = useState([]);
+  const [opportunities, setOpportunities] = useState([]);
 
   //tab value
   const [value, setValue] = useState("1");
@@ -161,6 +173,16 @@ function SingleContact() {
     }
   };
 
+  const fetchOpportunity = async () => {
+    try {
+      const response = await getOpportuntyByContactId(id);
+      setOpportunities(response.data[0]);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching opportunity:", error);
+    }
+  };
+
   //file delete
   const handleFileDelete = async (fileId) => {
     try {
@@ -187,6 +209,7 @@ function SingleContact() {
     fetchContact();
     fetchNote();
     fetchFile();
+    fetchOpportunity();
   }, [id]);
 
   const columns = [
@@ -264,7 +287,8 @@ function SingleContact() {
     <Box>
       <AppBarComponent handleLogout={handleLogout} />
       <DrawerComponent />
-      <Toaster position="top-right" reverseOrder={false} />
+      <ToastContainer position="top-right" autoClose={2000} />
+
       <Box
         sx={{
           marginTop: 10,
@@ -311,19 +335,19 @@ function SingleContact() {
                   <Typography variant="h5" fontWeight="bold" gutterBottom>
                     Contact Details
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
                     <strong>Name:</strong> {contact.name}
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
                     <strong>Email:</strong> {contact.email}
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
                     <strong>Contact No:</strong> {contact.phone}
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
                     <strong>Address:</strong> {contact.address}
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
                     <strong>Company Name:</strong> {contact.company}
                   </Typography>
                   <Typography variant="body1">
@@ -350,6 +374,35 @@ function SingleContact() {
                     <Typography variant="body1" color="gray">
                       No one assigned yet.
                     </Typography>
+                  )}
+                  <Typography
+                    variant="h5"
+                    fontWeight="bold"
+                    sx={{ marginTop: 2 }}
+                    gutterBottom
+                  >
+                    Opportunity Details
+                  </Typography>
+
+                  {!opportunities || opportunities.length === 0 ? (
+                    <Typography variant="body1" color="gray">
+                      No opportunity available.
+                    </Typography>
+                  ) : (
+                    <>
+                      <Typography
+                        variant="body1"
+                        sx={{ mb: 1 }}
+                        onClick={handleOpen}
+                        style={{
+                          cursor: "pointer",
+                          textDecoration: "none",
+                        }}
+                      >
+                        <strong>Opportunity Name: </strong>
+                        {opportunities?.name}
+                      </Typography>
+                    </>
                   )}
                 </>
               ) : (
@@ -583,6 +636,56 @@ function SingleContact() {
           </Grid>
         </Paper>
       </Box>
+      <InfoModal
+        open={open}
+        handleClose={handleClose}
+        title={"Opportunity Details"}
+      >
+        <TableContainer>
+          <Table size="small">
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <strong>Opportunity Name:</strong>
+                </TableCell>
+                <TableCell>{opportunities.name}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <strong>Expected Revenue:</strong>
+                </TableCell>
+                <TableCell>${opportunities.expected_revenue}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <strong>Close Date:</strong>
+                </TableCell>
+                <TableCell>
+                  {new Date(opportunities.close_date).toLocaleDateString()}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <strong>Pipeline:</strong>
+                </TableCell>
+                <TableCell>{opportunities.pipelineDetails?.name}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <strong>Stages:</strong>
+                </TableCell>
+                <TableCell>
+                  {opportunities?.stages?.length
+                    ? opportunities.stages
+                        .map((stage) => stage.stage)
+                        .join(", ")
+                    : "No Stages Available"}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </InfoModal>
     </Box>
   );
 }

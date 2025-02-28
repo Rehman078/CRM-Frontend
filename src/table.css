@@ -1,0 +1,51 @@
+/* .MuiIconButton-root[aria-label='Show/Hide columns'] {
+    padding: 0px !important;
+    min-width: unset !important;
+    width: auto !important;
+    height: auto !important;
+    color: #055266;
+
+}
+.MuiIconButton-root[aria-label='Show/Hide search']
+{
+    padding-left: 0px !important;
+    min-width: unset !important;
+    width: auto !important;
+    height: auto !important;
+    color: #055266;
+
+}
+
+.MuiIconButton-root[aria-label="Show/Hide filters"]
+{
+    padding-left: 10px !important;
+    min-width: unset !important;
+    width: auto !important;
+    height: auto !important;
+    color: #055266;
+
+}
+.muiltr-1ppdoay-MuiInputBase-root-MuiInput-root{
+    font-size: 14px;
+}
+.muiltr-1ag9q10{
+    padding: 0px !important;
+}
+
+.muiltr-bni3t0-MuiSelect-select-MuiInputBase-input.muiltr-bni3t0-MuiSelect-select-MuiInputBase-input.muiltr-bni3t0-MuiSelect-select-MuiInputBase-input{
+    padding-top: 10px;
+}
+
+.muiltr-1jd9sxe-MuiPaper-root{
+    width: 100%;
+    padding-inline: 20px;
+    padding-block: 20px;
+} */
+
+.css-10j3yc8-MuiFormLabel-root-MuiInputLabel-root,
+.css-1y2ya84-MuiInputBase-root-MuiInput-root-MuiSelect-root  {
+    font-size: 14px;
+    color: #055266;
+    font-weight: 500;
+    padding-left: 10px;
+}

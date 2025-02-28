@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContaxt";
-import { Link } from "react-router-dom";
-import { Toaster, toast } from "react-hot-toast";
-import MUIDataTable from "mui-datatables";
-import BreadLink from "@mui/material/Link";
-
+import React, { useEffect, useState, useMemo } from "react";
+import AppBarComponent from "../../components/AppBar";
+import DrawerComponent from "../../components/SideBar";
+import "../../table.css"
+import { MaterialReactTable } from "material-react-table";
+import CustomDeleteDialog from "../../components/CustomDialog";
 import {
   Box,
   Button,
@@ -18,21 +16,28 @@ import {
   MenuItem,
   Breadcrumbs,
 } from "@mui/material";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
-import AssignmentIcon from "@mui/icons-material/Assignment";
-import AppBarComponent from "../../components/AppBar";
-import DrawerComponent from "../../components/SideBar";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContaxt";
+import { Link } from "react-router-dom";
+import BreadLink from "@mui/material/Link";
+import { ToastContainer, toast } from "react-toastify";
 import {
   getContacts,
   deleteContacts,
   assignContact,
 } from "../../services/ContactApi";
 import { getUsers } from "../../services/AuthApi";
-import CustomDeleteDialog from "../../components/CustomDialog";
+import FolderOffIcon from '@mui/icons-material/FolderOff';
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 
 function Contact() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isAdminOrManager = user?.role === "Admin" || user?.role === "Manager";
+  
   const [contacts, setContacts] = useState([]);
+  const [selectedRows, setSelectedRows] = useState({});
   const [users, setUsers] = useState([]);
   const [assignedUsers, setAssignedUsers] = useState([]);
   const { logout } = useAuth();
@@ -44,8 +49,6 @@ function Contact() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState(null);
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const isAdminOrManager = user?.role === "Admin" || user?.role === "Manager";
 
   //assignment modal open
   const handleOpen = (contactId) => {
@@ -72,7 +75,7 @@ function Contact() {
   //delete contact
   const handleDelete = async (contactToDelete) => {
     try {
-      console.log(contactToDelete)
+      console.log(contactToDelete);
       await deleteContacts(contactToDelete);
       setContacts((prevContacts) =>
         prevContacts.filter((contact) => contact._id !== contactToDelete)
@@ -129,129 +132,86 @@ function Contact() {
     }
   };
 
-
   useEffect(() => {
-
     fetchContactsData();
     fetchUsersData();
   }, []);
 
   //get contact table
-  const columns = [
+  const columns = useMemo(() => [
     {
-      name: "id",
-      label: "ID",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          return <div style={{ textAlign: "center" }}>{dataIndex + 1}</div>;
-        },
-      },
+      accessorKey: "id",
+      header: "ID",
+      size: 5,
+      Cell: ({ row }) => <div>{row.index + 1}</div>,
     },
     {
-      name: "name",
-      label: "Name",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const contact = contacts[dataIndex];
-          return (
-            <Link to={`/contactdetail/${contact._id}`} style={{ textAlign: "center" }}>{contact.name}</Link>
-          );
-        },
-      },
+      accessorKey: "name",
+      header: "Name",
+      size: 40,
+      Cell: ({ row }) => (
+        <Link to={`/contactdetail/${row.original._id}`}>
+          {row.original.name}
+        </Link>
+      ),
     },
     {
-      name: "email",
-      label: "Email",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const contact = contacts[dataIndex];
-          return <div style={{ textAlign: "center" }}>{contact.email}</div>;
-        },
-      },
+      accessorKey: "email",
+      header: "Email",
+      size: 30,
+      Cell: ({ row }) => <div>{row.original.email}</div>,
     },
     {
-      name: "phone",
-      label: "Phone",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const contact = contacts[dataIndex];
-          return <div style={{ textAlign: "center" }}>{contact.phone}</div>;
-        },
-      },
+      accessorKey: "phone",
+      header: "Phone",
+      size: 50,
+      Cell: ({ row }) => <div>{row.original.phone}</div>,
     },
     {
-      name: "company",
-      label: "Company",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const contact = contacts[dataIndex];
-          return <div style={{ textAlign: "center" }}>{contact.company}</div>;
-        },
-      },
+      accessorKey: "company",
+      header: "Company",
+      size: 180,
+      Cell: ({ row }) => <div>{row.original.company}</div>,
     },
     {
-      name: "created_by",
-      label: "Created",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const contact = contacts[dataIndex];
-          return <div style={{ textAlign: "center" }}>{contact.created_by?.name || "Unknown"}</div>;
-        },
-      },
+      accessorKey: "created_by",
+      header: "Created",
+      size: 40,
+      Cell: ({ row }) => (
+        <div>{row.original.created_by?.name || "Unknown"}</div>
+      ),
     },
     {
-      name: "actions",
-      label: "Actions",
-      options: {
-        customBodyRenderLite: (dataIndex) => {
-          const contact = contacts[dataIndex];
-          return (
-            <div>
-              {isAdminOrManager && (
-                <IconButton
-                  sx={{ paddingRight: "14px" }}
-                  onClick={() => handleOpen(contact._id)}
-                >
-                  <AssignmentIcon sx={{ color: "#1f283e", fontSize: "27px" }} />
-                </IconButton>
-              )}
-              <Link to={`/editcontact/${contact._id}`}>
-                <IconButton color="primary">
-                  <BorderColorOutlinedIcon
-                    sx={{ color: "blue", fontSize: 26 }}
-                  />
-                </IconButton>
-              </Link>
-              {(contact.created_by.role === "SalesRep" &&
-                user?.role === "SalesRep") ||
-              ["Admin", "Manager"].includes(user?.role) ? (
-                <IconButton onClick={() => handleDialogOpen(contact._id)}>
-                  <DeleteOutlineOutlinedIcon
-                    sx={{ color: "red", fontSize: "30px" }}
-                  />
-                </IconButton>
-              ) : null}
-            </div>
-          );
-        },
+      accessorKey: "actions",
+      header: "Actions",
+      Cell: ({ row }) => {
+        const contact = row.original;
+        return (
+          <div>
+            {isAdminOrManager && (
+              <IconButton onClick={() => handleOpen(contact._id)}>
+                <AssignmentIcon sx={{ color: "#1f283e", fontSize: "25px" }} />
+              </IconButton>
+            )}
+            <Link to={`/editcontact/${contact._id}`}>
+              <IconButton color="primary">
+                <BorderColorOutlinedIcon sx={{ color: "blue", fontSize: 23 }} />
+              </IconButton>
+            </Link>
+            {(contact.created_by.role === "SalesRep" &&
+              user?.role === "SalesRep") ||
+            ["Admin", "Manager"].includes(user?.role) ? (
+              <IconButton onClick={() => handleDialogOpen(contact._id)}>
+                <DeleteOutlineOutlinedIcon
+                  sx={{ color: "red", fontSize: "25px" }}
+                />
+              </IconButton>
+            ) : null}
+          </div>
+        );
       },
     },
-  ];
-
-  const options = {
-    filter: true,
-    filterType: "dropdown",
-    responsive: "standard",
-    selectableRows: "none",
-    rowsPerPage: 5,
-    rowsPerPageOptions: [5, 10, 25, 50],
-    search: true,
-    download: false,
-    print: false,
-    viewColumns: true,
-    pagination: true,
-    sort: true,
-  };
+  ]);
 
   const breadcrumbItems = [
     { label: "Dashboard", Link: "/", href: "" },
@@ -260,10 +220,10 @@ function Contact() {
 
   return (
     <>
-      <Box sx={{ width: "90%", marginLeft: 9, marginTop: 9 }}>
+      <Box sx={{ width: "93%", marginLeft: 9, marginTop: 9 }}>
         <AppBarComponent handleLogout={handleLogout} />
         <DrawerComponent />
-        <Toaster position="top-right" reverseOrder={false} />
+        <ToastContainer position="top-right" autoClose={2000} />
         <Box>
           {/* BreadCrum */}
           <Breadcrumbs
@@ -308,12 +268,56 @@ function Contact() {
         </Box>
 
         {/* Contacts Table */}
-        <Box sx={{ marginLeft: 10, marginTop: 2 }}>
-          <MUIDataTable
-            title="Contacts List"
-            data={contacts}
+        <Box sx={{ marginLeft: 6, marginTop: 2 }}>
+          <MaterialReactTable
             columns={columns}
-            options={options}
+            data={contacts}
+            getRowId={(row) => row.id}
+            enableRowSelection
+            enableDensityToggle={false}
+            enableExpandAll={false}
+            enableColumnFilters={false}
+            onRowSelectionChange={setSelectedRows}
+            state={{ rowSelection: selectedRows }}
+            muiTableBodyRowProps={({ row }) => ({
+              sx: (theme) => ({
+                backgroundColor: selectedRows?.[row.id] ? "#FFCDD2" : "inherit",
+                "&:hover": {
+                  backgroundColor: selectedRows?.[row.id]
+                    ? "#D32F2F"
+                    : "#FCE4EC",
+                },
+              }),
+            })}
+            muiTableContainerProps={{ sx: { width: "100%" } }}
+            muiTableHeadCellProps={{
+              sx: {
+                backgroundColor: "#055266",
+                color: "white",
+                fontSize: "12px",
+                padding: "4px 8px",
+              },
+            }}
+            muiTableBodyCellProps={{
+              sx: {
+                fontSize: "12px",
+                padding: "4px 8px",
+              },
+            }}
+            renderEmptyRowsFallback={() => (
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                height="120px"
+              >
+                 <FolderOffIcon sx={{color:"gray", fontSize:"30px"}} />
+                <Typography variant="body1" color="#0d576b" sx={{color:"gray", fontSize:"15px"}}>
+                  No Contact Available
+                </Typography>
+              </Box>
+            )}
           />
         </Box>
 

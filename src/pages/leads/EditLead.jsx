@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Toaster, toast } from "react-hot-toast";
+import { ToastContainer, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import {
   TextField,
   Button,
@@ -26,7 +27,7 @@ import { getLeadsById, updateLead } from "../../services/LeadApi";
 function EditLead() {
   const { logout } = useAuth();
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -61,7 +62,9 @@ function EditLead() {
   const handleLead = async (data) => {
     try {
       await updateLead(id, data);
-      toast.success("Lead updated successfully!");
+      toast.success("Lead updated successfully!", {
+        onClose: () => navigate("/leads"), 
+      });
     } catch (error) {
       toast.error("Failed to update lead.");
     }
@@ -76,7 +79,7 @@ function EditLead() {
     <Box>
       <AppBarComponent handleLogout={logout} />
       <DrawerComponent />
-      <Toaster position="top-right" reverseOrder={false} />
+      <ToastContainer position="top-right" autoClose={2000} />
       <Box
         sx={{
           marginTop: 10,
@@ -116,7 +119,9 @@ function EditLead() {
                     label="Lead Name"
                     fullWidth
                     margin="normal"
+                      variant="standard"
                     {...register("name", { required: "Lead Name is required" })}
+                    InputLabelProps={{ shrink: true }}
                     error={!!errors.name}
                     helperText={errors.name?.message}
                   />
@@ -127,9 +132,11 @@ function EditLead() {
                     label="Contact No."
                     fullWidth
                     margin="normal"
+                      variant="standard"
                     {...register("contactinfo", {
                       required: "Contact No. is required",
                     })}
+                    InputLabelProps={{ shrink: true }}
                     error={!!errors.contactinfo}
                     helperText={errors.contactinfo?.message}
                   />
@@ -140,9 +147,11 @@ function EditLead() {
                     label="Lead Source"
                     fullWidth
                     margin="normal"
+                      variant="standard"
                     {...register("leadsource", {
                       required: "Lead Source is required",
                     })}
+                    InputLabelProps={{ shrink: true }}
                     error={!!errors.leadsource}
                     helperText={errors.leadsource?.message}
                   />
@@ -152,6 +161,8 @@ function EditLead() {
                   <FormControl
                     fullWidth
                     margin="normal"
+                      variant="standard"
+                    
                     error={!!errors.status}
                   >
                     <InputLabel>Status</InputLabel>
@@ -161,6 +172,7 @@ function EditLead() {
                         required: "Status is required",
                       })}
                       onChange={(e) => setValue("status", e.target.value)}
+                      InputLabelProps={{ shrink: true }}
                     >
                       <MenuItem value="New">New</MenuItem>
                       <MenuItem value="Contacted">Contacted</MenuItem>
