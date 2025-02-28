@@ -135,17 +135,12 @@ function Pipline() {
       ),
     },
     {
-      accessorKey: "actions",
-      header: "Actions",
+      accessorKey: "opporunity",
+      header: "Opportunity",
       Cell: ({ row }) => {
         const pipeline = row.original;
         return (
           <div>
-            <IconButton onClick={() => handleDialogOpen(pipeline._id)}>
-              <DeleteOutlineOutlinedIcon
-                sx={{ color: "red", fontSize: "25px" }}
-              />
-            </IconButton>
             <Link to={`/add/opportunity/${pipeline._id}`}>
               <IconButton color="primary">
                 <AddTaskOutlinedIcon sx={{ color: "blue", fontSize: 26 }} />
@@ -158,6 +153,22 @@ function Pipline() {
                 <VisibilityIcon sx={{ color: "blue", fontSize: 26 }} />
               </IconButton>
             </Link>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "actions",
+      header: "Actions",
+      Cell: ({ row }) => {
+        const pipeline = row.original;
+        return (
+          <div>
+            <IconButton onClick={() => handleDialogOpen(pipeline._id)}>
+              <DeleteOutlineOutlinedIcon
+                sx={{ color: "red", fontSize: "25px" }}
+              />
+            </IconButton>
           </div>
         );
       },

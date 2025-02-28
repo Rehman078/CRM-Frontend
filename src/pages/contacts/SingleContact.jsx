@@ -49,7 +49,6 @@ import {
 } from "../../services/FileApi";
 import { getOpportuntyByContactId } from "../../services/OpporunityApi";
 
-
 function SingleContact() {
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -59,11 +58,6 @@ function SingleContact() {
   //for navigation
   const navigate = useNavigate();
   const { id } = useParams();
-
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
   const [contact, setContact] = useState(null);
   const [files, setFiles] = useState([]);
   const [notes, setNotes] = useState([]);
@@ -85,6 +79,18 @@ function SingleContact() {
     source: "Contact",
     source_id: id,
   });
+  const [open, setOpen] = useState(false);
+  const [selectedOpportunity, setSelectedOpportunity] = useState(null);
+  
+  const handleOpen = (opportunity) => {
+    setSelectedOpportunity(opportunity); 
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedOpportunity(null); 
+  };
 
   //change tab value
   const handleChange = (event, newValue) => {
@@ -176,7 +182,8 @@ function SingleContact() {
   const fetchOpportunity = async () => {
     try {
       const response = await getOpportuntyByContactId(id);
-      setOpportunities(response.data[0]);
+      console.log(response);
+      setOpportunities(response.data);
       console.log(response.data);
     } catch (error) {
       console.error("Error fetching opportunity:", error);
@@ -278,6 +285,7 @@ function SingleContact() {
     uploaded_by_role: file.uploaded_by.role,
     createdAt: new Date(file.createdAt).toLocaleDateString(),
   }));
+
   // Breadcrumb name
   const breadcrumbItems = [
     { label: "Dashboard", Link: "/", href: "" },
@@ -384,25 +392,25 @@ function SingleContact() {
                     Opportunity Details
                   </Typography>
 
-                  {!opportunities || opportunities.length === 0 ? (
-                    <Typography variant="body1" color="gray">
-                      No opportunity available.
-                    </Typography>
-                  ) : (
-                    <>
+                  {opportunities && opportunities.length > 0 ? (
+                    opportunities.map((opportunity) => (
                       <Typography
+                        key={opportunity._id}
                         variant="body1"
                         sx={{ mb: 1 }}
-                        onClick={handleOpen}
+                        onClick={() => handleOpen(opportunity)} // Pass opportunity
                         style={{
                           cursor: "pointer",
                           textDecoration: "none",
                         }}
                       >
-                        <strong>Opportunity Name: </strong>
-                        {opportunities?.name}
+                        <strong>Opportunity Name: </strong> {opportunity?.name}
                       </Typography>
-                    </>
+                    ))
+                  ) : (
+                    <Typography variant="body1" color="gray">
+                      No opportunity available.
+                    </Typography>
                   )}
                 </>
               ) : (
@@ -636,55 +644,58 @@ function SingleContact() {
           </Grid>
         </Paper>
       </Box>
+      {/* Modal for Opportunity Details */}
       <InfoModal
         open={open}
         handleClose={handleClose}
-        title={"Opportunity Details"}
+        title="Opportunity Details"
       >
-        <TableContainer>
-          <Table size="small">
-            <TableBody>
-              <TableRow>
-                <TableCell>
-                  <strong>Opportunity Name:</strong>
-                </TableCell>
-                <TableCell>{opportunities.name}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <strong>Expected Revenue:</strong>
-                </TableCell>
-                <TableCell>${opportunities.expected_revenue}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <strong>Close Date:</strong>
-                </TableCell>
-                <TableCell>
-                  {new Date(opportunities.close_date).toLocaleDateString()}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <strong>Pipeline:</strong>
-                </TableCell>
-                <TableCell>{opportunities.pipelineDetails?.name}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <strong>Stages:</strong>
-                </TableCell>
-                <TableCell>
-                  {opportunities?.stages?.length
-                    ? opportunities.stages
-                        .map((stage) => stage.stage)
-                        .join(", ")
-                    : "No Stages Available"}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {selectedOpportunity && (
+          <TableContainer>
+            <Table size="small">
+              <TableBody>
+                <TableRow>
+                  <TableCell>
+                    <strong>Opportunity Name:</strong>
+                  </TableCell>
+                  <TableCell>{selectedOpportunity.name}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Expected Revenue:</strong>
+                  </TableCell>
+                  <TableCell>{selectedOpportunity.expected_revenue}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Close Date:</strong>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(
+                      selectedOpportunity.close_date
+                    ).toLocaleDateString()}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Pipeline:</strong>
+                  </TableCell>
+                  <TableCell>
+                    {selectedOpportunity.pipelineDetails?.name}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <strong>Stage:</strong>
+                  </TableCell>
+                  <TableCell>
+                  {selectedOpportunity.stageName?.stage}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </InfoModal>
     </Box>
   );

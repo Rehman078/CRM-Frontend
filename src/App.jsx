@@ -15,8 +15,7 @@ import Pipline from "./pages/pipline/Pipline";
 import Stage from "./pages/stages/Stage"
 import Opportunity from "./pages/opportunity/Opportunity";
 import AddOppotunity from "./pages/opportunity/AddOpportunity";
-import SingleOpportunity from "./pages/opportunity/SingleOpportunity";
-import NewOpportunity from "./pages/opportunity/NewOpportunity";
+import NewOpportunity from "./pages/opportunity/OpportunityByPipeline";
 function App() {
 
   return (
@@ -142,14 +141,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <AddOppotunity />
-              </ProtectedRoute>
-            }
-          ></Route>
-            <Route
-            path="/opportunities/:id"
-            element={
-              <ProtectedRoute>
-                <SingleOpportunity />
               </ProtectedRoute>
             }
           ></Route>

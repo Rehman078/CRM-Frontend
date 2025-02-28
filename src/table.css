@@ -1,4 +1,4 @@
-/* .MuiIconButton-root[aria-label='Show/Hide columns'] {
+.MuiIconButton-root[aria-label='Show/Hide columns'] {
     padding: 0px !important;
     min-width: unset !important;
     width: auto !important;
@@ -40,7 +40,7 @@
     width: 100%;
     padding-inline: 20px;
     padding-block: 20px;
-} */
+} 
 
 .css-10j3yc8-MuiFormLabel-root-MuiInputLabel-root,
 .css-1y2ya84-MuiInputBase-root-MuiInput-root-MuiSelect-root  {

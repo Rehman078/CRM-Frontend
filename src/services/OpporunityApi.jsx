@@ -30,22 +30,6 @@ export const getOpportunities = async () => {
   }
 };
 
-export const deleteOpportunities = async (id) => {
-  try {
-    const config = getConfig();
-    const response = await axios.delete(
-      `${API_BASE_URL}/opportunities/${id}`,
-      config
-    );
-
-    return response.data;
-  } catch (error) {
-    throw new Error(
-      error.response ? error.response.data.message : error.message
-    );
-  }
-};
-
 export const getOpportuntyByContactId = async (contactId) => {
   try {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -102,11 +86,24 @@ export const getOpportuntyByLeadId = async (leadId) => {
   }
 };
 
-export const getOpporuintyById = async (id) => {
+export const getOpportunitiesByPipelineId = async (pipelineId) => {
   try {
-    const config = getConfig();
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = user?.token;
+    const role = user?.role;
+
+    const config = {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+        Role: role || "",
+      },
+      params: {
+        pipelineId: pipelineId
+        
+      },
+    };
     const response = await axios.get(
-      `${API_BASE_URL}/opportunities/${id}`,
+      `${API_BASE_URL}/opportunities/opportunity`,
       config
     );
     return response.data;
@@ -115,7 +112,7 @@ export const getOpporuintyById = async (id) => {
       error.response ? error.response.data.message : error.message
     );
   }
-};
+}
 
 export const updateOpportunityStage = async (opportunityId, newStageId) => {
   try {
@@ -146,30 +143,19 @@ export const updateOpportunityStage = async (opportunityId, newStageId) => {
   }
 };
 
-export const getOpportunitiesByPipelineId = async (pipelineId) => {
+export const deleteOpportunities = async (id) => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    const role = user?.role;
-
-    const config = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        Role: role || "",
-      },
-      params: {
-        pipelineId: pipelineId
-        
-      },
-    };
-    const response = await axios.get(
-      `${API_BASE_URL}/opportunities/opportunity`,
+    const config = getConfig();
+    const response = await axios.delete(
+      `${API_BASE_URL}/opportunities/${id}`,
       config
     );
+
     return response.data;
   } catch (error) {
     throw new Error(
       error.response ? error.response.data.message : error.message
     );
   }
-}
+};
+

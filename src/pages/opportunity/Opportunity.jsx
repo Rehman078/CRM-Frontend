@@ -1,3 +1,4 @@
+import "../../table.css"
 import React, { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../../context/AuthContaxt";
 import { useNavigate, Link } from "react-router-dom";
@@ -11,7 +12,7 @@ import { getOpportunities, deleteOpportunities } from "../../services/Opporunity
 import CustomDeleteDialog from "../../components/CustomDialog";
 import { MaterialReactTable } from "material-react-table";
 import FolderOffIcon from '@mui/icons-material/FolderOff';
-import "../../table.css"
+
 function Opportunity() {
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -77,10 +78,7 @@ const [dialogOpen, setDialogOpen] = useState(false);
           header: "Opportunity Name",
           size: 20,
           Cell: ({ row }) => (
-             <Link to={`/opportunities/${row.original._id}`} style={{ textDecoration: "none",}}>
-               {row.original.name}
-             </Link>
-            // <div >{row.original.name}</div>
+            <div >{row.original.name}</div>
           ),
         },
         {
