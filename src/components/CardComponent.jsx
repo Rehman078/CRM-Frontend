@@ -13,12 +13,17 @@ export default function CardComponent({ title, count, content }) {
   return (
     <Card
       sx={{
-        width: "300px",
-        backgroundColor: "#F0EFEF",
+        width: "100%",
+        height: "200px",
+        backgroundColor: "#ffffff",
         color: "black",
         textAlign: "center",
         p: 1,
         borderRadius: 2,
+        boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <CardContent>

@@ -95,18 +95,26 @@ export default function MiniDrawer() {
   ];
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center" }}>
+    <Box sx={{ display: "flex" }}>
       <AppBarComponent handleLogout={handleLogout} />
       <DrawerComponent />
-      <Box>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          marginLeft: "73px",
+          marginTop: "64px",
+          width: "calc(100% - 73px)",
+        }}
+      >
         <Grid
           container
-          spacing={isAdminOrManager ? 5 : 10}
+          spacing={3}
           justifyContent="center"
-          sx={{ marginTop: 6 }}
         >
           {cardData.map((card, index) => (
-            <Grid item key={index}>
+            <Grid item xs={12} sm={6} md={3} key={index}>
               <CardComponent
                 title={card.title}
                 count={card.count}
